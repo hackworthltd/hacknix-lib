@@ -16,7 +16,7 @@ in
   }
 }:
 
-with import (localPkgs.lib.fetchers.fixedNixpkgs + "/pkgs/top-level/release-lib.nix") {
+with import (localLib.fixedNixpkgs + "/pkgs/top-level/release-lib.nix") {
   inherit supportedSystems scrubJobs nixpkgsArgs;
 };
 

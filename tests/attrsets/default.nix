@@ -12,7 +12,7 @@ in
 stdenv.mkDerivation {
   name = "dln-types-attrsets-${version}";
   buildInputs = [ pkgs.nix ];
-  NIX_PATH="nixpkgs=${pkgs.path}:nixpkgs-overlays=${pkgs.lib.hacknix.path}/overlays/lib";
+  NIX_PATH="nixpkgs=${pkgs.path}:nixpkgs-overlays=${pkgs.lib.hacknix-lib.path}/overlays/lib";
 
   buildCommand = ''
     datadir="${pkgs.nix}/share"
@@ -29,7 +29,7 @@ stdenv.mkDerivation {
     cacheDir=$TEST_ROOT/binary-cache
 
     nix-store --init
-    cd ${pkgs.lib.hacknix.path}/tests/attrsets
+    cd ${pkgs.lib.hacknix-lib.path}/tests/attrsets
     
     nix-instantiate --eval --strict attrsets.nix
     [[ "$(nix-instantiate --eval --strict attrsets.nix)" == "[ ]" ]]

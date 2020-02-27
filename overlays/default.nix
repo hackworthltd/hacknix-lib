@@ -10,7 +10,7 @@ let
     ./lib/fetchers.nix
     ./lib/ipaddr.nix
     ./lib/maintainers.nix
-    ./lib/hacknix.nix
+    ./lib/hacknix-lib.nix
     ./lib/environment.nix
     ./lib/misc.nix
     ./lib/operators.nix

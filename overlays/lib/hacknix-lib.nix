@@ -10,11 +10,8 @@ let
 in
 {
   lib = (super.lib or {}) // {
-    hacknix = (super.lib.hacknix or {}) // {
+    hacknix-lib = (super.lib.hacknix-lib or {}) // {
       inherit path;
-
-      # Access to hacknix-lib's fixed nixpkgs.
-      inherit (localLibs) nixpkgs;
     };
   };
 }
