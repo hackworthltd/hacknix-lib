@@ -7,7 +7,7 @@
 
 let
 
-  hacknixLibUri = "git@github.com:hackworthltd/hacknix-lib.git";
+  hacknixLibUri = "https://github.com/hackworthltd/hacknix-lib.git";
 
   mkFetchGithub = value: {
     inherit value;
