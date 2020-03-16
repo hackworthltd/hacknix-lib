@@ -27,19 +27,18 @@ let
 
   # Clean Haskell projects.
   cleanSourceFilterHaskell = name: type: let baseName = baseNameOf (toString name); in ! (
-    type == "directory" && (
-      baseName == ".cabal-sandbox" ||
-      baseName == ".stack-work"    ||
-      baseName == "dist"           ||
-      baseName == "dist-newstyle"
-    ) ||
-    type != "directory" && (
-      baseName == ".ghci"                 ||
-      baseName == ".stylish-haskell.yaml" ||
-      baseName == "cabal.sandbox.config"  ||
-      baseName == "cabal.project"         ||
+      baseName == ".cabal-sandbox"                    ||
+      super.lib.hasPrefix ".stack-work" baseName      ||
+      super.lib.hasPrefix ".ghc.environment" baseName ||
+      baseName == "dist"                              ||
+      baseName == "dist-newstyle"                     ||
+      baseName == ".ghci"                             ||
+      baseName == ".stylish-haskell.yaml"             ||
+      super.lib.hasSuffix ".hi" baseName              ||
+      baseName == "cabal.sandbox.config"              ||
+      baseName == "cabal.project"                     ||
+      baseName == "cabal.project.local"               ||
       baseName == "sources.txt"
-    )
   );
   cleanSourceHaskell = src: super.lib.cleanSourceWith { filter = cleanSourceFilterHaskell; inherit src; };
 
