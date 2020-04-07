@@ -63,10 +63,10 @@ let
       baseName == ".tags"                                  ||
       baseName == ".vim.custom"                            ||
       baseName == ".vscodeignore"                          ||
-      builtins.match "^#.*#$" baseName != null             ||
-      builtins.match "^\\.#.*$" baseName != null           ||
-      builtins.match "^.*_flymake\\..*$" baseName != null  ||
-      builtins.match "^flycheck_.*\\.el$" baseName != null
+      super.lib.hasPrefix "#" baseName                     ||
+      super.lib.hasPrefix ".#" baseName                    ||
+      super.lib.hasPrefix "flycheck_" baseName             ||
+      builtins.match "^.*_flymake\\..*$" baseName != null
     )
   );
   cleanSourceEditors = src: super.lib.cleanSourceWith { filter = cleanSourceFilterEditors; inherit src; };
