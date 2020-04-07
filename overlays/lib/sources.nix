@@ -74,15 +74,16 @@ let
 
   # Clean maintainer files that don't affect Nix builds.
   cleanSourceFilterMaintainer = name: type: let baseName = baseNameOf (toString name); in ! (
-    type != "directory" && (
-      # Note: .git can be a file when it's in a submodule directory
-      baseName == ".git"           ||
+    # Note: .git can be a file when it's in a submodule directory
+    baseName == ".git" ||
+
+    (type != "directory" && (
       baseName == ".gitattributes" ||
       baseName == ".gitignore"     ||
       baseName == ".gitmodules"    ||
       baseName == ".npmignore"     ||
       baseName == ".travis.yml"
-    )
+    ))
   );
   cleanSourceMaintainer = src: super.lib.cleanSourceWith { filter = cleanSourceFilterMaintainer; inherit src; };
 
