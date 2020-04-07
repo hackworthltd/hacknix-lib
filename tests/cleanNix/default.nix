@@ -21,6 +21,7 @@ stdenv.mkDerivation rec {
   checkPhase = ''
     ${testLib.test-dir "." "nix"}
     ${testLib.test-no-file "." "*.nix"}
+    ${testLib.test-no-file "." "result*"}
   '';
 
   installPhase = ''

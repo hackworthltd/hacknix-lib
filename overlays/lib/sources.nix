@@ -19,7 +19,9 @@ let
   # cosmetic changes (comments, formatting, etc.) won't.
   cleanSourceFilterNix = name: type: let baseName = baseNameOf (toString name); in ! (
     type != "directory" && (
-      super.lib.hasSuffix ".nix" baseName
+      super.lib.hasSuffix ".nix" baseName    ||
+      super.lib.hasPrefix "result-" baseName ||
+      baseName == "result"
     )
   );
   cleanSourceNix = src: super.lib.cleanSourceWith { filter = cleanSourceFilterNix; inherit src; };
