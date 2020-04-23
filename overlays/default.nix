@@ -2,7 +2,7 @@ self: super:
 
 let
 
-  localLib = import ../lib;
+  localLib = import ../nix/default.nix;
   overlays = [
     ./lib/attrsets.nix
     ./lib/customisation.nix
@@ -27,5 +27,4 @@ let
     ./pkgs/hacknix-lib-source
   ];
 
-in
-localLib.composeOverlaysFromFiles overlays super
+in localLib.composeOverlaysFromFiles overlays super

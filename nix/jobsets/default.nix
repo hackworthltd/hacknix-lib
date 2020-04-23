@@ -1,9 +1,7 @@
 # Based on
 # https://github.com/input-output-hk/iohk-ops/blob/df01a228e559e9a504e2d8c0d18766794d34edea/jobsets/default.nix
 
-{ nixpkgs ? <nixpkgs>
-, declInput ? {}
-}:
+{ nixpkgs ? <nixpkgs>, declInput ? { } }:
 
 let
 
@@ -15,7 +13,7 @@ let
     emailresponsible = false;
   };
 
-  pkgs = import nixpkgs {};
+  pkgs = import nixpkgs { };
 
   defaultSettings = {
     enabled = 1;
@@ -25,12 +23,10 @@ let
     checkinterval = 60;
     enableemail = false;
     emailoverride = "";
-    nixexprpath = "jobsets/release.nix";
+    nixexprpath = "release.nix";
     nixexprinput = "hacknixLib";
     description = "A library of useful Nix functions and types.";
-    inputs = {
-      hacknixLib = mkFetchGithub "${hacknixLibUri} master";
-    };
+    inputs = { hacknixLib = mkFetchGithub "${hacknixLibUri} master"; };
   };
 
   # Build against a nixpkgs-channels repo. Run these every 3 hours so
@@ -39,7 +35,8 @@ let
     checkinterval = 60 * 60 * 3;
     inputs = {
       hacknixLib = mkFetchGithub "${hacknixLibUri} ${hacknixLibBranch}";
-      nixpkgs_override = mkFetchGithub "https://github.com/NixOS/nixpkgs-channels.git ${nixpkgsRev}";
+      nixpkgs_override = mkFetchGithub
+        "https://github.com/NixOS/nixpkgs-channels.git ${nixpkgsRev}";
     };
   };
 
@@ -49,25 +46,28 @@ let
     checkinterval = 60 * 60 * 12;
     inputs = {
       hacknixLib = mkFetchGithub "${hacknixLibUri} ${hacknixLibBranch}";
-      nixpkgs_override = mkFetchGithub "https://github.com/NixOS/nixpkgs.git ${nixpkgsRev}";
+      nixpkgs_override =
+        mkFetchGithub "https://github.com/NixOS/nixpkgs.git ${nixpkgsRev}";
     };
   };
 
-  mainJobsets = with pkgs.lib; mapAttrs (name: settings: defaultSettings // settings) (rec {
-    master = {};
-    nixpkgs-unstable = mkNixpkgsChannels "master" "nixpkgs-unstable";
-    nixpkgs = mkNixpkgs "master" "master";
-  });
+  mainJobsets = with pkgs.lib;
+    mapAttrs (name: settings: defaultSettings // settings) (rec {
+      master = { };
+      nixpkgs-unstable = mkNixpkgsChannels "master" "nixpkgs-unstable";
+      nixpkgs = mkNixpkgs "master" "master";
+    });
 
   jobsetsAttrs = mainJobsets;
 
   jobsetJson = pkgs.writeText "spec.json" (builtins.toJSON jobsetsAttrs);
 
 in {
-  jobsets = with pkgs.lib; pkgs.runCommand "spec.json" {} ''
-    cat <<EOF
-    ${builtins.toJSON declInput}
-    EOF
-    cp ${jobsetJson} $out
-  '';
+  jobsets = with pkgs.lib;
+    pkgs.runCommand "spec.json" { } ''
+      cat <<EOF
+      ${builtins.toJSON declInput}
+      EOF
+      cp ${jobsetJson} $out
+    '';
 }

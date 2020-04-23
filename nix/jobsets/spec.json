@@ -3,7 +3,7 @@
     "hidden": false,
     "description": "hacknix-lib jobsets",
     "nixexprinput": "src",
-    "nixexprpath": "jobsets/default.nix",
+    "nixexprpath": "nix/jobsets/default.nix",
     "checkinterval": 60,
     "schedulingshares": 100,
     "enableemail": true,
