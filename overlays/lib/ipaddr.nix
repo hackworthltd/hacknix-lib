@@ -3,11 +3,9 @@
 self: super:
 
 with super.lib;
-
 let
-
   ## These functions deal with IPv4 addresses expressed as a string.
-  
+
   # Note: does not handle "terse" CIDR syntax, e.g., "10.0.10/24" does
   # not parse.
   #
@@ -26,13 +24,13 @@ let
         let
           suffix' = parsedIPv4PrefixLength parse;
         in
-          if (suffix' == [] || suffix' == [null])
+          if (suffix' == [] || suffix' == [ null ])
           then []
           else map (x: toInt (removePrefix "/" x)) suffix';
     in
-      if (parse != [])              &&
-         (all (x: x <= 255) octets) &&
-         (all (x: x <= 32) suffix)
+      if (parse != [])
+      && (all (x: x <= 255) octets)
+      && (all (x: x <= 32) suffix)
       then octets ++ suffix
       else [];
 
@@ -102,10 +100,10 @@ let
       octets = parsedIPv4Addr l;
       suffix = parsedIPv4PrefixLength l;
     in
-      if (length l < 4)                     ||
-         (length l > 5)                     ||
-         (any (x: x < 0 || x > 255) octets) ||
-         (any (x: x < 0 || x > 32) suffix)
+      if (length l < 4)
+      || (length l > 5)
+      || (any (x: x < 0 || x > 255) octets)
+      || (any (x: x < 0 || x > 32) suffix)
       then ""
       else
         let
@@ -195,39 +193,39 @@ let
 
   prefixLengthToNetmask = prefixLength:
     assert (prefixLength >= 0 && prefixLength < 33);
-    if prefixLength == 0  then "0.0.0.0"         else
-    if prefixLength == 1  then "128.0.0.0"       else
-    if prefixLength == 2  then "192.0.0.0"       else
-    if prefixLength == 3  then "224.0.0.0"       else
-    if prefixLength == 4  then "240.0.0.0"       else
-    if prefixLength == 5  then "248.0.0.0"       else
-    if prefixLength == 6  then "252.0.0.0"       else
-    if prefixLength == 7  then "254.0.0.0"       else
-    if prefixLength == 8  then "255.0.0.0"       else
-    if prefixLength == 9  then "255.128.0.0"     else
-    if prefixLength == 10 then "255.192.0.0"     else
-    if prefixLength == 11 then "255.224.0.0"     else
-    if prefixLength == 12 then "255.240.0.0"     else
-    if prefixLength == 13 then "255.248.0.0"     else
-    if prefixLength == 14 then "255.252.0.0"     else
-    if prefixLength == 15 then "255.254.0.0"     else
-    if prefixLength == 16 then "255.255.0.0"     else
-    if prefixLength == 17 then "255.255.128.0"   else
-    if prefixLength == 18 then "255.255.192.0"   else
-    if prefixLength == 19 then "255.255.224.0"   else
-    if prefixLength == 20 then "255.255.240.0"   else
-    if prefixLength == 21 then "255.255.248.0"   else
-    if prefixLength == 22 then "255.255.252.0"   else
-    if prefixLength == 23 then "255.255.254.0"   else
-    if prefixLength == 24 then "255.255.255.0"   else
-    if prefixLength == 25 then "255.255.255.128" else
-    if prefixLength == 26 then "255.255.255.192" else
-    if prefixLength == 27 then "255.255.255.224" else
-    if prefixLength == 28 then "255.255.255.240" else
-    if prefixLength == 29 then "255.255.255.248" else
-    if prefixLength == 30 then "255.255.255.252" else
-    if prefixLength == 31 then "255.255.255.254" else
-    "255.255.255.255";
+    if prefixLength == 0 then "0.0.0.0" else
+      if prefixLength == 1 then "128.0.0.0" else
+        if prefixLength == 2 then "192.0.0.0" else
+          if prefixLength == 3 then "224.0.0.0" else
+            if prefixLength == 4 then "240.0.0.0" else
+              if prefixLength == 5 then "248.0.0.0" else
+                if prefixLength == 6 then "252.0.0.0" else
+                  if prefixLength == 7 then "254.0.0.0" else
+                    if prefixLength == 8 then "255.0.0.0" else
+                      if prefixLength == 9 then "255.128.0.0" else
+                        if prefixLength == 10 then "255.192.0.0" else
+                          if prefixLength == 11 then "255.224.0.0" else
+                            if prefixLength == 12 then "255.240.0.0" else
+                              if prefixLength == 13 then "255.248.0.0" else
+                                if prefixLength == 14 then "255.252.0.0" else
+                                  if prefixLength == 15 then "255.254.0.0" else
+                                    if prefixLength == 16 then "255.255.0.0" else
+                                      if prefixLength == 17 then "255.255.128.0" else
+                                        if prefixLength == 18 then "255.255.192.0" else
+                                          if prefixLength == 19 then "255.255.224.0" else
+                                            if prefixLength == 20 then "255.255.240.0" else
+                                              if prefixLength == 21 then "255.255.248.0" else
+                                                if prefixLength == 22 then "255.255.252.0" else
+                                                  if prefixLength == 23 then "255.255.254.0" else
+                                                    if prefixLength == 24 then "255.255.255.0" else
+                                                      if prefixLength == 25 then "255.255.255.128" else
+                                                        if prefixLength == 26 then "255.255.255.192" else
+                                                          if prefixLength == 27 then "255.255.255.224" else
+                                                            if prefixLength == 28 then "255.255.255.240" else
+                                                              if prefixLength == 29 then "255.255.255.248" else
+                                                                if prefixLength == 30 then "255.255.255.252" else
+                                                                  if prefixLength == 31 then "255.255.255.254" else
+                                                                    "255.255.255.255";
 
   ipv4AddrFromCIDR = s:
     assert isIPv4CIDR s;
@@ -244,7 +242,6 @@ let
   netmaskFromIPv4CIDR = s:
     assert isIPv4CIDR s;
     prefixLengthToNetmask (prefixLengthFromCIDR s);
-
 in
 {
   lib = (super.lib or {}) // {

@@ -1,5 +1,4 @@
 let
-
   test-dir = dir: dirPattern: ''
     echo -n "Checking for ${dirPattern} directory(s)... "
     [[ "$(./bin/dir-exists.sh ${dir} ${dirPattern})" == "yes" ]] || (echo "${dirPattern} does not exist!" && exit 1)
@@ -23,7 +22,6 @@ let
     [[ "$(./bin/file-exists.sh ${dir} ${filePattern})" == "no" ]] || (echo "${filePattern} exists!" && exit 1)
     echo "pass"
   '';
-
 in
 {
   inherit test-dir;

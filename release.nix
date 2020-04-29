@@ -1,23 +1,22 @@
 let
-
   localLib = import nix/default.nix;
-  localPkgs = (import ./default.nix) { };
-
-in { supportedSystems ? [ "x86_64-linux" "x86_64-darwin" ], scrubJobs ? true
+  localPkgs = (import ./default.nix) {};
+in
+{ supportedSystems ? [ "x86_64-linux" "x86_64-darwin" ]
+, scrubJobs ? true
 , nixpkgsArgs ? {
-  config = {
-    allowUnfree = false;
-    inHydra = true;
-  };
-  overlays = [ localPkgs.overlays.all (import ./tests) ];
-} }:
+    config = {
+      allowUnfree = false;
+      inHydra = true;
+    };
+    overlays = [ localPkgs.overlays.all (import ./tests) ];
+  }
+}:
 
 with import (localLib.fixedNixpkgs + "/pkgs/top-level/release-lib.nix") {
   inherit supportedSystems scrubJobs nixpkgsArgs;
 };
-
 let
-
   jobs = mapTestOn {
     dlnCleanSourceNix = all;
     dlnCleanSourceHaskell = all;
@@ -37,5 +36,5 @@ let
     dlnFfdhe = all;
     dlnTypes = all;
   };
-
-in jobs
+in
+jobs

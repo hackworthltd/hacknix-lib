@@ -1,7 +1,5 @@
 self: super:
-
 let
-
   wellKnownHosts = {
     github = {
       hostNames = super.lib.singleton "github.com";
@@ -12,7 +10,6 @@ let
       publicKey = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFSMqzJeV9rUzU4kWitGjeR4PWSa29SPqJ1fVkhtj3Hw9xjLVXVYrU9QlYWrOLXBpQ6KWjbjTDTdDkoohFzgbEY=";
     };
   };
-
 in
 {
   lib = (super.lib or {}) // {

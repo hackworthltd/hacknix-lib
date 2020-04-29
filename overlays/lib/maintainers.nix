@@ -1,9 +1,6 @@
 self: super:
-
 let
-
   dhess = "Drew Hess <dhess-src@hackworthltd.com>";
-
 in
 {
   lib = (super.lib or {}) // {

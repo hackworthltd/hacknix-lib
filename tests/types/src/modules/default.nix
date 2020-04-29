@@ -11,5 +11,6 @@
     # modules here see our overlays.
     specialArgs.lib = pkgs.lib;
 
-  }) config options;
+  }) config options
+    ;
 }

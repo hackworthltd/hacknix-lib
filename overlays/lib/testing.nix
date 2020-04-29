@@ -1,9 +1,7 @@
 ## Convenience functions for tests, esp. for Hydras.
 
 self: super:
-
 let
-
 in
 {
   lib = (super.lib or {}) // {

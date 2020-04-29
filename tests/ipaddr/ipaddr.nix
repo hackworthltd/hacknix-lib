@@ -2,16 +2,13 @@
 # nix-instantiate --eval --strict ipaddr.nix
 # if the resulting list is empty, all tests passed
 
-with import <nixpkgs> { };
+with import <nixpkgs> {};
 
 with pkgs.lib;
 with pkgs.lib.ipaddr;
-
 let
-
   allTrue = all id;
   anyTrue = any id;
-
 in
 runTests rec {
 
@@ -29,27 +26,27 @@ runTests rec {
 
   test-parseIPv4-3 = {
     expr = parseIPv4 "10.0.10/24";
-    expected = [ ];
+    expected = [];
   };
 
   test-parseIPv4-4 = {
     expr = parseIPv4 "256.255.255.255";
-    expected = [ ];
+    expected = [];
   };
 
   test-parseIPv4-5 = {
     expr = parseIPv4 "10.0.10.1/33";
-    expected = [ ];
+    expected = [];
   };
 
   test-parseIPv4-6 = {
     expr = parseIPv4 "-10.0.10.1";
-    expected = [ ];
+    expected = [];
   };
 
   test-parseIPv4-7 = {
     expr = parseIPv4 "10.0.10.1.33";
-    expected = [ ];
+    expected = [];
   };
 
   test-parseIPv4-8 = {
@@ -582,7 +579,7 @@ runTests rec {
 
   test-parsedIPv4PrefixLength-1 = {
     expr = parsedIPv4PrefixLength (parseIPv4 "10.0.10.1");
-    expected = [ ];
+    expected = [];
   };
 
   test-c4CIDRSuffix-2 = {
@@ -690,7 +687,7 @@ runTests rec {
   # Note: see docs for `parseIPv6`, but technically only the non-global
   # scope addresses should parse with a scope ID. However, the current
   # implementation does not enforce this.
-  
+
   test-parseIPv6-scope-id-1 = rec {
     addrs = map (x: x + "%eth0") goodAddrs;
     expr = flatten (map parseIPv6 addrs);
@@ -746,92 +743,92 @@ runTests rec {
   };
 
   badAddrs = [
-      ""
-      "1:2:3:4:5:6:7"
-      "1:2::3:4:5:6:7::8"
-      "1:2:3:4:5:6:7:8:9"
-      "1:2::3:4:5:6:7::8:9"
+    ""
+    "1:2:3:4:5:6:7"
+    "1:2::3:4:5:6:7::8"
+    "1:2:3:4:5:6:7:8:9"
+    "1:2::3:4:5:6:7::8:9"
 
-      # Dot-decimal notation for IPv4-mapped IPv6 addresses.
-      "1:2:3:4:5:6:7:255.255.255.255"
-      "1:2:3:4:5:6:7:0.0.0.0"
-      "1:2:3:4:5::256.255.255.255"
-      "1:2:3:4:5::255.256.255.255"
-      "1:2:3:4:5::255.255.256.255"
-      "1:2:3:4:5::255.255.255.256"
-      ":::ffff:192.168.1.1"
-      ":ffff:192.168.1.1"
+    # Dot-decimal notation for IPv4-mapped IPv6 addresses.
+    "1:2:3:4:5:6:7:255.255.255.255"
+    "1:2:3:4:5:6:7:0.0.0.0"
+    "1:2:3:4:5::256.255.255.255"
+    "1:2:3:4:5::255.256.255.255"
+    "1:2:3:4:5::255.255.256.255"
+    "1:2:3:4:5::255.255.255.256"
+    ":::ffff:192.168.1.1"
+    ":ffff:192.168.1.1"
 
-      "1:2:3:4:5:6:1.2.3"
-      "1:2:3:4:5:6:0.0.0"
-      "1:2:3:4:5::1.2.3"
-      "1:2:3:4:5::0.0.0"
-      "1:2:3:4::1.2.3"
-      "1:2:3:4::0.0.0"
-      "1:2:3::1.2.3"
-      "1:2:3::0.0.0"
-      "1:2::1.2.3"
-      "1:2::0.0.0"
-      "1::1.2.3"
-      "1::0.0.0"
+    "1:2:3:4:5:6:1.2.3"
+    "1:2:3:4:5:6:0.0.0"
+    "1:2:3:4:5::1.2.3"
+    "1:2:3:4:5::0.0.0"
+    "1:2:3:4::1.2.3"
+    "1:2:3:4::0.0.0"
+    "1:2:3::1.2.3"
+    "1:2:3::0.0.0"
+    "1:2::1.2.3"
+    "1:2::0.0.0"
+    "1::1.2.3"
+    "1::0.0.0"
 
-      "1:2:3:4:5:6:a.1.2.3"
-      "1:2:3:4:5:6:a.0.0.0"
-      "1:2:3:4:5:6:255.a.255.255"
-      "1:2:3:4:5:6:0.a.0.0"
-      "1:2:3:4:5:6:255.255.a.255"
-      "1:2:3:4:5:6:0.0.a.0"
-      "1:2:3:4:5:6:255.255.255.a"
-      "1:2:3:4:5:6:0.0.0.a"
-      "1:2:3:4:5:::a.255.255.255"
-      "1:2:3:4:5:::a.0.0.0"
-      "1:2:3:4:5:::255.a.255.255"
-      "1:2:3:4:5:::0.a.0.0"
-      "1:2:3:4:5:::255.255.a.255"
-      "1:2:3:4:5:::0.0.a.0"
-      "1:2:3:4:5:::255.255.255.a"
-      "1:2:3:4:5:::0.0.0.a"
+    "1:2:3:4:5:6:a.1.2.3"
+    "1:2:3:4:5:6:a.0.0.0"
+    "1:2:3:4:5:6:255.a.255.255"
+    "1:2:3:4:5:6:0.a.0.0"
+    "1:2:3:4:5:6:255.255.a.255"
+    "1:2:3:4:5:6:0.0.a.0"
+    "1:2:3:4:5:6:255.255.255.a"
+    "1:2:3:4:5:6:0.0.0.a"
+    "1:2:3:4:5:::a.255.255.255"
+    "1:2:3:4:5:::a.0.0.0"
+    "1:2:3:4:5:::255.a.255.255"
+    "1:2:3:4:5:::0.a.0.0"
+    "1:2:3:4:5:::255.255.a.255"
+    "1:2:3:4:5:::0.0.a.0"
+    "1:2:3:4:5:::255.255.255.a"
+    "1:2:3:4:5:::0.0.0.a"
 
-      # XXX dhess - these pass. Should they?
-      # "1:2:3:4:5:6:255.255.255"
-      # "1:2:3:4:5::255.255.255"
-      # "1:2:3:4::255.255.255"
-      # "1:2:3::255.255.255"
-      # "1:2::255.255.255"
-      # "1::255.255.255"
+    # XXX dhess - these pass. Should they?
+    # "1:2:3:4:5:6:255.255.255"
+    # "1:2:3:4:5::255.255.255"
+    # "1:2:3:4::255.255.255"
+    # "1:2:3::255.255.255"
+    # "1:2::255.255.255"
+    # "1::255.255.255"
 
-      "a"
-      "abcd"
-      ":::1"
-      "::::1"
-      "a:::1"
-      "a::::1"
-      "1:2:::3"
-      "1:2::::3"
-      "12345678::1"
-      "1:2:3:4:"
-      "1:2:3:4:5:6:7:8:"
-      "1:2:3:4::1:"
-      "1::2::3:4"
-      "1::2::3::4::5::6::7::8"
-      "1: 2::3"
-      "12345::1"
-      "::12345"
-      "habc::1"
-      "1234::/"
-      "1234::1/"
-      "::/"
-      "::1/"
-      "1234::1/"
-      "1234::%"
-      "1234::1%"
-      "1234::1%eth0/"
-      "1234::1/%eth0"
-      "1234::/%eth0"
-      "1234::/64%eth0"
-      "1234::1/64%eth0"
-      "1234::1%/eth0"
-      "1234::%/eth0"
+    "a"
+    "abcd"
+    ":::1"
+    "::::1"
+    "a:::1"
+    "a::::1"
+    "1:2:::3"
+    "1:2::::3"
+    "12345678::1"
+    "1:2:3:4:"
+    "1:2:3:4:5:6:7:8:"
+    "1:2:3:4::1:"
+    "1::2::3:4"
+    "1::2::3::4::5::6::7::8"
+    "1: 2::3"
+    "12345::1"
+    "::12345"
+    "habc::1"
+    "1234::/"
+    "1234::1/"
+    "::/"
+    "::1/"
+    "1234::1/"
+    "1234::%"
+    "1234::1%"
+    "1234::1%eth0/"
+    "1234::1/%eth0"
+    "1234::/%eth0"
+    "1234::/64%eth0"
+    "1234::1/64%eth0"
+    "1234::1%/eth0"
+    "1234::%/eth0"
   ];
 
   test-parseIPv6-bad = {
@@ -1084,25 +1081,25 @@ runTests rec {
 
   # Note -- it is an evaluation error to call parsedIPv6Addr or parsedIPv6PrefixLength
   # on an invalid IPv6 address.
-  
+
   test-parsedIPv6PrefixLength-1 = {
     expr = parsedIPv6PrefixLength (parseIPv6 "2001::1/128");
-    expected = [128];
+    expected = [ 128 ];
   };
 
   test-parsedIPv6PrefixLength-2 = {
     expr = parsedIPv6PrefixLength (parseIPv6 "::ffff:1/32");
-    expected = [32];
+    expected = [ 32 ];
   };
 
   test-parsedIPv6PrefixLength-3 = {
     expr = parsedIPv6PrefixLength (parseIPv6 "1234::1/64");
-    expected = [64];
+    expected = [ 64 ];
   };
 
   test-parsedIPv6PrefixLength-4 = {
     expr = parsedIPv6PrefixLength (parseIPv6 "1234::1%eth0/64");
-    expected = [64];
+    expected = [ 64 ];
   };
 
   test-parsedIPv6PrefixLength-5 = {

@@ -1,5 +1,4 @@
 let
-
   # Fetch (from GitHub) a Nix expression (i.e., repo), as specified by
   # its revision.
   fixedNixSrc = pathOverride: src:
@@ -14,20 +13,21 @@ let
 
   fixedNixpkgs = fixedNixSrc "nixpkgs_override" sources.nixpkgs-unstable;
   nixpkgs = import fixedNixpkgs;
-  pkgs = nixpkgs { };
+  pkgs = nixpkgs {};
   lib = pkgs.lib;
 
   ## These functions are useful for building package sets from
   ## stand-alone overlay repos.
 
   composeOverlays = overlays: pkgSet:
-    let toFix = lib.foldl' (lib.flip lib.extends) (lib.const pkgSet) overlays;
+    let
+      toFix = lib.foldl' (lib.flip lib.extends) (lib.const pkgSet) overlays;
     in lib.fix toFix;
 
   composeOverlaysFromFiles = overlaysFiles: pkgSet:
     composeOverlays (map import overlaysFiles) pkgSet;
-
-in lib // {
+in
+lib // {
 
   ## Export from here anything that could be useful to other packages
   ## that import this one, and want to bootstrap before they can load

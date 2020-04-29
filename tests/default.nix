@@ -3,12 +3,9 @@
 ## in each package's checkPhase.
 
 self: super:
-
 let
-
   inherit (super) callPackage;
   inherit (self) lib;
-
 in
 {
 
@@ -24,12 +21,12 @@ in
 
   ## cleanPackage tests.
 
-  dlnCleanPackageNix = lib.sources.cleanPackage lib.sources.cleanSourceNix (callPackage ./cleanNix { src = ./test-dir;});
-  dlnCleanPackageHaskell = lib.sources.cleanPackage lib.sources.cleanSourceHaskell (callPackage ./cleanHaskell { src = ./test-dir;});
-  dlnCleanPackageSystemCruft = lib.sources.cleanPackage lib.sources.cleanSourceSystemCruft (callPackage ./cleanSystemCruft { src = ./test-dir;});
-  dlnCleanPackageEditors = lib.sources.cleanPackage lib.sources.cleanSourceEditors (callPackage ./cleanEditors { src = ./test-dir;});
-  dlnCleanPackageMaintainer = lib.sources.cleanPackage lib.sources.cleanSourceMaintainer (callPackage ./cleanMaintainer { src = ./test-dir;});
-  dlnCleanPackageAllExtraneous = lib.sources.cleanPackage lib.sources.cleanSourceAllExtraneous (callPackage ./cleanAllExtraneous { src = ./test-dir;});
+  dlnCleanPackageNix = lib.sources.cleanPackage lib.sources.cleanSourceNix (callPackage ./cleanNix { src = ./test-dir; });
+  dlnCleanPackageHaskell = lib.sources.cleanPackage lib.sources.cleanSourceHaskell (callPackage ./cleanHaskell { src = ./test-dir; });
+  dlnCleanPackageSystemCruft = lib.sources.cleanPackage lib.sources.cleanSourceSystemCruft (callPackage ./cleanSystemCruft { src = ./test-dir; });
+  dlnCleanPackageEditors = lib.sources.cleanPackage lib.sources.cleanSourceEditors (callPackage ./cleanEditors { src = ./test-dir; });
+  dlnCleanPackageMaintainer = lib.sources.cleanPackage lib.sources.cleanSourceMaintainer (callPackage ./cleanMaintainer { src = ./test-dir; });
+  dlnCleanPackageAllExtraneous = lib.sources.cleanPackage lib.sources.cleanSourceAllExtraneous (callPackage ./cleanAllExtraneous { src = ./test-dir; });
 
 
   ## attrsets tests.

@@ -2,16 +2,13 @@
 # nix-instantiate --eval --strict attrsets.nix
 # if the resulting list is empty, all tests passed
 
-with import <nixpkgs> { };
+with import <nixpkgs> {};
 
 with pkgs.lib;
 with pkgs.lib.attrsets;
-
 let
-
   allTrue = all id;
   anyTrue = any id;
-
 in
 runTests rec {
 
@@ -25,12 +22,11 @@ runTests rec {
   };
 
   test-allAttrs-trivially-true = rec {
-    example = {
-    };
+    example = {};
     expr = allAttrs (v: v.name == "bob") example;
     expected = true;
   };
-  
+
   test-allAttrs-false = rec {
     example = {
       foo = { name = "bob"; };
@@ -50,12 +46,11 @@ runTests rec {
   };
 
   test-anyAttrs-trivially-false = rec {
-    example = {
-    };
+    example = {};
     expr = anyAttrs (v: v.name == "bob") example;
     expected = false;
   };
-  
+
   test-anyAttrs-false = rec {
     example = {
       foo = { name = "bob"; };
@@ -75,12 +70,11 @@ runTests rec {
   };
 
   test-noAttrs-trivially-true = rec {
-    example = {
-    };
+    example = {};
     expr = noAttrs (v: v.name == "bob") example;
     expected = true;
   };
-  
+
   test-noAttrs-false = rec {
     example = {
       foo = { name = "bob"; };

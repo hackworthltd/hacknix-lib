@@ -2,17 +2,13 @@
 , pkgs
 , lib
 }:
-
 let
-
   version = "1";
-
 in
-
 stdenv.mkDerivation {
   name = "dln-types-misc-${version}";
   buildInputs = [ pkgs.nix ];
-  NIX_PATH="nixpkgs=${pkgs.path}:nixpkgs-overlays=${pkgs.lib.hacknix-lib.path}/overlays/lib";
+  NIX_PATH = "nixpkgs=${pkgs.path}:nixpkgs-overlays=${pkgs.lib.hacknix-lib.path}/overlays/lib";
 
   buildCommand = ''
     datadir="${pkgs.nix}/share"

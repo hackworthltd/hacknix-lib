@@ -2,9 +2,7 @@
 ## Nix or nixpkgs, for whatever reason.
 
 self: super:
-
 let
-
   ## Tests on attrsets.
 
   /* Given an attrset, return true if `pred` is true for each value in
@@ -79,7 +77,6 @@ let
   */
 
   mapValuesToList = f: attrs: super.lib.mapAttrsToList (_: v: f v) attrs;
-
 in
 {
   lib = (super.lib or {}) // {

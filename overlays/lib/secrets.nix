@@ -2,7 +2,6 @@
 ## entering the Nix store.
 
 self: super:
-
 let
   # True if the argument is a path (or a string, when treated as a
   # path) that resolves to a Nix store path; i.e., the path begins
@@ -26,7 +25,6 @@ let
 
   secretReadFile = path: builtins.readFile (secretPath path);
   secretFileContents = path: super.lib.fileContents (secretPath path);
-
 in
 {
   lib = (super.lib or {}) // {
@@ -36,4 +34,3 @@ in
     };
   };
 }
-

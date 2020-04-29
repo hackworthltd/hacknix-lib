@@ -1,14 +1,12 @@
 ## Additional useful types, mostly for NixOS modules.
 
 self: super:
-
 let
-
   inherit (super.lib) all ipaddr mkOption stringToCharacters types;
   inherit (super.lib.secrets) resolvesToStorePath;
 
   addCheckDesc = desc: elemType: check: types.addCheck elemType check
-    // { description = "${elemType.description} (with check: ${desc})"; };
+  // { description = "${elemType.description} (with check: ${desc})"; };
 
   ## String types.
 
@@ -86,8 +84,8 @@ let
 
   # Port 0 is sometimes used to indicate a "don't-care".
   port = types.ints.between 0 65535;
-
-in rec
+in
+rec
 {
   lib = (super.lib or {}) // {
     types = (super.lib.types or {}) // {

@@ -10,7 +10,6 @@
 ## documentation).
 
 self: super:
-
 let
   # In most cases, I believe that filtering Nix files from the source
   # hash is the right thing to do. They're obviously already evaluated
@@ -19,9 +18,9 @@ let
   # cosmetic changes (comments, formatting, etc.) won't.
   cleanSourceFilterNix = name: type: let baseName = baseNameOf (toString name); in ! (
     type != "directory" && (
-      super.lib.hasSuffix ".nix" baseName    ||
-      super.lib.hasPrefix "result-" baseName ||
-      baseName == "result"
+      super.lib.hasSuffix ".nix" baseName
+      || super.lib.hasPrefix "result-" baseName
+      || baseName == "result"
     )
   );
   cleanSourceNix = src: super.lib.cleanSourceWith { filter = cleanSourceFilterNix; inherit src; };
@@ -29,18 +28,18 @@ let
 
   # Clean Haskell projects.
   cleanSourceFilterHaskell = name: type: let baseName = baseNameOf (toString name); in ! (
-      baseName == ".cabal-sandbox"                    ||
-      super.lib.hasPrefix ".stack-work" baseName      ||
-      super.lib.hasPrefix ".ghc.environment" baseName ||
-      baseName == "dist"                              ||
-      baseName == "dist-newstyle"                     ||
-      baseName == ".ghci"                             ||
-      baseName == ".stylish-haskell.yaml"             ||
-      super.lib.hasSuffix ".hi" baseName              ||
-      baseName == "cabal.sandbox.config"              ||
-      baseName == "cabal.project"                     ||
-      baseName == "cabal.project.local"               ||
-      baseName == "sources.txt"
+    baseName == ".cabal-sandbox"
+    || super.lib.hasPrefix ".stack-work" baseName
+    || super.lib.hasPrefix ".ghc.environment" baseName
+    || baseName == "dist"
+    || baseName == "dist-newstyle"
+    || baseName == ".ghci"
+    || baseName == ".stylish-haskell.yaml"
+    || super.lib.hasSuffix ".hi" baseName
+    || baseName == "cabal.sandbox.config"
+    || baseName == "cabal.project"
+    || baseName == "cabal.project.local"
+    || baseName == "sources.txt"
   );
   cleanSourceHaskell = src: super.lib.cleanSourceWith { filter = cleanSourceFilterHaskell; inherit src; };
 
@@ -57,16 +56,16 @@ let
   # Clean files related to editors and IDEs.
   cleanSourceFilterEditors = name: type: let baseName = baseNameOf (toString name); in ! (
     type != "directory" && (
-      baseName == ".dir-locals.el"                         ||
-      baseName == ".netrwhist"                             ||
-      baseName == ".projectile"                            ||
-      baseName == ".tags"                                  ||
-      baseName == ".vim.custom"                            ||
-      baseName == ".vscodeignore"                          ||
-      super.lib.hasPrefix "#" baseName                     ||
-      super.lib.hasPrefix ".#" baseName                    ||
-      super.lib.hasPrefix "flycheck_" baseName             ||
-      builtins.match "^.*_flymake\\..*$" baseName != null
+      baseName == ".dir-locals.el"
+      || baseName == ".netrwhist"
+      || baseName == ".projectile"
+      || baseName == ".tags"
+      || baseName == ".vim.custom"
+      || baseName == ".vscodeignore"
+      || super.lib.hasPrefix "#" baseName
+      || super.lib.hasPrefix ".#" baseName
+      || super.lib.hasPrefix "flycheck_" baseName
+      || builtins.match "^.*_flymake\\..*$" baseName != null
     )
   );
   cleanSourceEditors = src: super.lib.cleanSourceWith { filter = cleanSourceFilterEditors; inherit src; };
@@ -75,15 +74,16 @@ let
   # Clean maintainer files that don't affect Nix builds.
   cleanSourceFilterMaintainer = name: type: let baseName = baseNameOf (toString name); in ! (
     # Note: .git can be a file when it's in a submodule directory
-    baseName == ".git" ||
-
-    (type != "directory" && (
-      baseName == ".gitattributes" ||
-      baseName == ".gitignore"     ||
-      baseName == ".gitmodules"    ||
-      baseName == ".npmignore"     ||
-      baseName == ".travis.yml"
-    ))
+    baseName == ".git"
+    || (
+      type != "directory" && (
+        baseName == ".gitattributes"
+        || baseName == ".gitignore"
+        || baseName == ".gitmodules"
+        || baseName == ".npmignore"
+        || baseName == ".travis.yml"
+      )
+    )
   );
   cleanSourceMaintainer = src: super.lib.cleanSourceWith { filter = cleanSourceFilterMaintainer; inherit src; };
 
@@ -92,11 +92,19 @@ let
   # `lib.cleanSource` from Nixpkgs.
   cleanSourceAllExtraneous = src:
     cleanSourceMaintainer
-      (cleanSourceEditors
-        (cleanSourceSystemCruft
-          (cleanSourceHaskell
-            (cleanSourceNix
-              (super.lib.cleanSource src)))));
+      (
+        cleanSourceEditors
+          (
+            cleanSourceSystemCruft
+              (
+                cleanSourceHaskell
+                  (
+                    cleanSourceNix
+                      (super.lib.cleanSource src)
+                  )
+              )
+          )
+      );
 
 
   # Clean the `src` attribute of a package. This is convenient when
@@ -106,9 +114,13 @@ let
   # attribute that they generate. Instead, you can apply this
   # function, plus one or more source cleaners, to a package that
   # is the result of a `callPackage` function application.
-  cleanPackage = cleanSrc: pkg: (pkg.overrideAttrs (oldAttrs: {
-    src = cleanSrc oldAttrs.src;
-  }));
+  cleanPackage = cleanSrc: pkg: (
+    pkg.overrideAttrs (
+      oldAttrs: {
+        src = cleanSrc oldAttrs.src;
+      }
+    )
+  );
 
 
   ## Useful for importing whole directories.
@@ -117,27 +129,31 @@ let
   ## https://github.com/dtzWill/nur-packages/commit/f601a6b024ac93f7ec242e6e3dbbddbdcf24df0b#diff-a013e20924130857c649dd17226282ff
 
   listDirectory = action: dir:
-  let
-    list = builtins.readDir dir;
-    names = builtins.attrNames list;
-    allowedName = baseName: !(
-      # From lib/sources.nix, ignore editor backup/swap files
-      builtins.match "^\\.sw[a-z]$" baseName != null ||
-      builtins.match "^\\..*\\.sw[a-z]$" baseName != null ||
-      # Otherwise it's good
-      false);
-    filteredNames = builtins.filter allowedName names;
-  in builtins.listToAttrs (builtins.map
-    (name: {
-      name = builtins.replaceStrings [".nix"] [""] name;
-      value = action (dir + ("/" + name));
-    })
-    filteredNames);
+    let
+      list = builtins.readDir dir;
+      names = builtins.attrNames list;
+      allowedName = baseName: !(
+        # From lib/sources.nix, ignore editor backup/swap files
+        builtins.match "^\\.sw[a-z]$" baseName != null
+        || builtins.match "^\\..*\\.sw[a-z]$" baseName != null
+        || # Otherwise it's good
+        false
+      );
+      filteredNames = builtins.filter allowedName names;
+    in builtins.listToAttrs (
+      builtins.map
+        (
+          name: {
+            name = builtins.replaceStrings [ ".nix" ] [ "" ] name;
+            value = action (dir + ("/" + name));
+          }
+        )
+        filteredNames
+    );
 
   pathDirectory = listDirectory (d: d);
   importDirectory = listDirectory import;
   mkCallDirectory = callPkgs: listDirectory (p: callPkgs p {});
-
 in
 {
   lib = (super.lib or {}) // {

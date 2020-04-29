@@ -4,14 +4,10 @@
 , pkgs
 , src
 }:
-
 let
-
   version = "1";
   testLib = import ../lib.nix;
-
 in
-
 stdenv.mkDerivation rec {
   inherit src;
 

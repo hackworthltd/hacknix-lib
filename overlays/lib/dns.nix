@@ -1,7 +1,5 @@
 self: super:
-
 let
-
   ## Google Public DNS servers.
 
   googleV4DNS = [ "8.8.8.8" "8.8.4.4" ];
@@ -36,8 +34,7 @@ let
 
   aAndAV4DNSOverTLS = [ "217.169.20.22@853#dns.aa.net.uk" "217.169.20.23@853#dns.aa.net.uk" ];
   aAndAV6DNSOverTLS = [ "2001:8b0::2022@853#dns.aa.net.uk" "2001:8b0::2023@853#dns.aa.net.uk" ];
-  aAndADNSOverTLS = aAndAV4DNSOverTLS ++ aAndAV6DNSOverTLS;  
-
+  aAndADNSOverTLS = aAndAV4DNSOverTLS ++ aAndAV6DNSOverTLS;
 in
 {
   lib = (super.lib or {}) // {
