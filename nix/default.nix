@@ -26,6 +26,13 @@ let
 
   composeOverlaysFromFiles = overlaysFiles: pkgSet:
     composeOverlays (map import overlaysFiles) pkgSet;
+
+  fixedGitignoreNix = fixedNixSrc "gitignore.nix" sources."gitignore.nix";
+  gitignoreSource = (import fixedGitignoreNix { inherit lib; }).gitignoreSource;
+
+  fixedPreCommitHooksNix = fixedNixSrc "pre-commit-hooks.nix" sources."pre-commit-hooks.nix";
+  preCommitHooks = import fixedPreCommitHooksNix;
+    
 in
 lib // {
 
@@ -36,4 +43,6 @@ lib // {
   inherit fixedNixSrc fixedNixpkgs;
   inherit nixpkgs pkgs;
   inherit composeOverlays composeOverlaysFromFiles;
+  inherit gitignoreSource;
+  inherit preCommitHooks;
 }

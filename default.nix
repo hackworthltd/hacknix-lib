@@ -18,4 +18,12 @@ in
 
   overlays.all = localOverlays;
   modules = self.lib.sources.pathDirectory ./modules;
+
+  source-code-checks = localLib.preCommitHooks.run {
+    src = localLib.gitignoreSource ./.;
+    hooks = {
+      shellcheck.enable = true;
+      nixpkgs-fmt.enable = true;
+    };
+  };
 }
