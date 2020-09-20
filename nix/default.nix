@@ -4,7 +4,8 @@ let
   fixedNixSrc = pathOverride: src:
     let
       try = builtins.tryEval (builtins.findFile builtins.nixPath pathOverride);
-    in if try.success then
+    in
+    if try.success then
       builtins.trace "Using <${pathOverride}>" try.value
     else
       src;
@@ -13,7 +14,7 @@ let
 
   fixedNixpkgs = fixedNixSrc "nixpkgs_override" sources.nixpkgs-unstable;
   nixpkgs = import fixedNixpkgs;
-  pkgs = nixpkgs {};
+  pkgs = nixpkgs { };
   lib = pkgs.lib;
 
   ## These functions are useful for building package sets from
@@ -22,7 +23,8 @@ let
   composeOverlays = overlays: pkgSet:
     let
       toFix = lib.foldl' (lib.flip lib.extends) (lib.const pkgSet) overlays;
-    in lib.fix toFix;
+    in
+    lib.fix toFix;
 
   composeOverlaysFromFiles = overlaysFiles: pkgSet:
     composeOverlays (map import overlaysFiles) pkgSet;
@@ -32,7 +34,11 @@ let
 
   fixedPreCommitHooksNix = fixedNixSrc "pre-commit-hooks.nix" sources."pre-commit-hooks.nix";
   preCommitHooks = import fixedPreCommitHooksNix;
-    
+
+  # Make local niv available until the nixpkgs version is fixed to
+  # work with GitHub Actions.
+  niv = (import sources.niv { }).niv;
+
 in
 lib // {
 
@@ -45,4 +51,5 @@ lib // {
   inherit composeOverlays composeOverlaysFromFiles;
   inherit gitignoreSource;
   inherit preCommitHooks;
+  inherit niv;
 }

@@ -2,7 +2,7 @@
 }:
 
 localLib.pkgs.mkShell {
-  buildInputs = with localLib.pkgs; [
-    niv
+  buildInputs = [
+    localLib.niv
   ];
 }
