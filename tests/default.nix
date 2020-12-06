@@ -2,10 +2,10 @@
 ## All you need to do is build these packages, and the tests will run
 ## in each package's checkPhase.
 
-self: super:
+final: prev:
 let
-  inherit (super) callPackage;
-  inherit (self) lib;
+  inherit (prev) callPackage;
+  inherit (final) lib;
 in
 {
 
@@ -31,25 +31,25 @@ in
 
   ## attrsets tests.
 
-  dlnAttrSets = callPackage ./attrsets {};
+  dlnAttrSets = callPackage ./attrsets { };
 
 
   ## IP address utility tests.
 
-  dlnIPAddr = callPackage ./ipaddr {};
+  dlnIPAddr = callPackage ./ipaddr { };
 
 
   ## Miscellaneous tests.
 
-  dlnMisc = callPackage ./misc {};
+  dlnMisc = callPackage ./misc { };
 
 
   ## Types tests.
 
-  dlnTypes = callPackage ./types {};
+  dlnTypes = callPackage ./types { };
 
 
   ## Security tests.
 
-  dlnFfdhe = callPackage ./security/ffdhe {};
+  dlnFfdhe = callPackage ./security/ffdhe { };
 }
