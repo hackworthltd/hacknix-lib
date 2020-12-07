@@ -1,11 +1,17 @@
-self: super:
+final: prev:
 let
-  localLib = import ../nix/default.nix;
+  composeOverlays = overlays: pkgSet: with prev;
+    let
+      toFix = lib.foldl' (lib.flip lib.extends) (lib.const pkgSet) overlays;
+    in
+    lib.fix toFix;
+
+  composeOverlaysFromFiles = overlaysFiles: pkgSet:
+    composeOverlays (map import overlaysFiles) pkgSet;
+
   overlays = [
     ./lib/attrsets.nix
-    ./lib/customisation.nix
     ./lib/dns.nix
-    ./lib/fetchers.nix
     ./lib/ipaddr.nix
     ./lib/maintainers.nix
     ./lib/hacknix-lib.nix
@@ -16,13 +22,11 @@ let
     ./lib/security.nix
     ./lib/ssh.nix
     ./lib/sources.nix
-    ./lib/testing.nix
     ./lib/types.nix
     ./haskell/lib.nix
     ./pkgs/build-support
     ./pkgs/emacs
     ./pkgs/security
-    ./pkgs/hacknix-lib-source
   ];
 in
-localLib.composeOverlaysFromFiles overlays super
+composeOverlaysFromFiles overlays prev
