@@ -34,6 +34,10 @@
               };
           in
           {
+            inherit (pkgs) lib;
+            inherit (pkgs) packageSource;
+            inherit (pkgs) haskell;
+            inherit (pkgs) melpaPackagesNgFor melpaPackagesNgFor';
             inherit (pkgs) ffdhe2048Pem ffdhe3072Pem ffdhe4096Pem;
           }
         );
