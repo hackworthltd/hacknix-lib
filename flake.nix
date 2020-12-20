@@ -14,11 +14,63 @@
     let
       supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
+
+      overlaysAsList = map (name: self.overlays.${name}) (builtins.attrNames self.overlays);
+
+      nixpkgsFor = forAllSystems (system:
+        import nixpkgs {
+          inherit system;
+          overlays = overlaysAsList;
+        }
+      );
+
+      ## Useful for importing whole directories.
+      ##
+      ## Thanks to dtzWill:
+      ## https://github.com/dtzWill/nur-packages/commit/f601a6b024ac93f7ec242e6e3dbbddbdcf24df0b#diff-a013e20924130857c649dd17226282ff
+
+      listDirectory = action: dir:
+        let
+          list = builtins.readDir dir;
+          names = builtins.attrNames list;
+          allowedName = baseName: !(
+            # From lib/sources.nix, ignore editor backup/swap files
+            builtins.match "^\\.sw[a-z]$" baseName != null
+            || builtins.match "^\\..*\\.sw[a-z]$" baseName != null
+            || # Otherwise it's good
+            false
+          );
+          filteredNames = builtins.filter allowedName names;
+        in
+        builtins.listToAttrs (
+          builtins.map
+            (
+              name: {
+                name = builtins.replaceStrings [ ".nix" ] [ "" ] name;
+                value = action (dir + ("/" + name));
+              }
+            )
+            filteredNames
+        );
+      importDirectory = listDirectory import;
+      pathDirectory = listDirectory (d: d);
+      mkCallDirectory = callPkgs: listDirectory (p: callPkgs p { });
+
     in
     {
-      overlays = map
-        (name: import (./nix/overlays + "/${name}"))
-        (builtins.attrNames (builtins.readDir ./nix/overlays));
+      # Nix's flake support expects this to be an attrset, even though
+      # it's not useful as an attrset downstream (e.g.,
+      # `nixpkgs.overlays` expects to be passed a list of overlays,
+      # not an attrset.)
+      overlays = importDirectory ./nix/overlays // {
+        "000-lib-sources" = (final: prev: {
+          lib = (prev.lib or { }) // {
+            sources = (prev.lib.sources or { }) // {
+              inherit listDirectory pathDirectory importDirectory mkCallDirectory;
+            };
+          };
+        });
+      };
 
       packages = forAllSystems
         (system:
@@ -30,7 +82,7 @@
                   allowUnfree = true;
                   allowBroken = true;
                 };
-                overlays = self.overlays;
+                overlays = overlaysAsList;
               };
           in
           {
@@ -52,7 +104,7 @@
                   allowBroken = true;
                   inHydra = true;
                 };
-                overlays = self.overlays ++ [
+                overlays = overlaysAsList ++ [
                   (import ./tests)
                 ];
               };
