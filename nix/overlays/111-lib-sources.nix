@@ -9,83 +9,93 @@
 ## `builtins.filterSource`; see the `lib.cleanSourceWith`
 ## documentation).
 
-self: super:
+final: prev:
 let
   # In most cases, I believe that filtering Nix files from the source
   # hash is the right thing to do. They're obviously already evaluated
   # when a nix-build command is executed, so if *what they evaluate*
   # changes they'll cause a rebuild anyway, as they should; while
   # cosmetic changes (comments, formatting, etc.) won't.
-  cleanSourceFilterNix = name: type: let baseName = baseNameOf (toString name); in ! (
-    type != "directory" && (
-      super.lib.hasSuffix ".nix" baseName
-      || super.lib.hasPrefix "result-" baseName
-      || baseName == "result"
-    )
-  );
-  cleanSourceNix = src: super.lib.cleanSourceWith { filter = cleanSourceFilterNix; inherit src; };
+  cleanSourceFilterNix = name: type:
+    let baseName = baseNameOf (toString name); in
+      ! (
+        type != "directory" && (
+          prev.lib.hasSuffix ".nix" baseName
+          || prev.lib.hasPrefix "result-" baseName
+          || baseName == "result"
+        )
+      );
+  cleanSourceNix = src: prev.lib.cleanSourceWith { filter = cleanSourceFilterNix; inherit src; };
 
 
   # Clean Haskell projects.
-  cleanSourceFilterHaskell = name: type: let baseName = baseNameOf (toString name); in ! (
-    baseName == ".cabal-sandbox"
-    || super.lib.hasPrefix ".stack-work" baseName
-    || super.lib.hasPrefix ".ghc.environment" baseName
-    || baseName == "dist"
-    || baseName == "dist-newstyle"
-    || baseName == ".ghci"
-    || baseName == ".stylish-haskell.yaml"
-    || super.lib.hasSuffix ".hi" baseName
-    || baseName == "cabal.sandbox.config"
-    || baseName == "cabal.project"
-    || baseName == "cabal.project.local"
-    || baseName == "sources.txt"
-  );
-  cleanSourceHaskell = src: super.lib.cleanSourceWith { filter = cleanSourceFilterHaskell; inherit src; };
+  cleanSourceFilterHaskell = name: type:
+    let baseName = baseNameOf (toString name); in
+      ! (
+        baseName == ".cabal-sandbox"
+        || prev.lib.hasPrefix ".stack-work" baseName
+        || prev.lib.hasPrefix ".ghc.environment" baseName
+        || baseName == "dist"
+        || baseName == "dist-newstyle"
+        || baseName == ".ghci"
+        || baseName == ".stylish-haskell.yaml"
+        || prev.lib.hasSuffix ".hi" baseName
+        || baseName == "cabal.sandbox.config"
+        || baseName == "cabal.project"
+        || baseName == "cabal.project.local"
+        || baseName == "sources.txt"
+      );
+  cleanSourceHaskell = src: prev.lib.cleanSourceWith { filter = cleanSourceFilterHaskell; inherit src; };
 
 
   # Clean system cruft, e.g., .DS_Store files on macOS filesystems.
-  cleanSourceFilterSystemCruft = name: type: let baseName = baseNameOf (toString name); in ! (
-    type != "directory" && (
-      baseName == ".DS_Store"
-    )
-  );
-  cleanSourceSystemCruft = src: super.lib.cleanSourceWith { filter = cleanSourceFilterSystemCruft; inherit src; };
+  cleanSourceFilterSystemCruft = name: type:
+    let baseName = baseNameOf (toString name); in
+      ! (
+        type != "directory" && (
+          baseName == ".DS_Store"
+        )
+      );
+  cleanSourceSystemCruft = src: prev.lib.cleanSourceWith { filter = cleanSourceFilterSystemCruft; inherit src; };
 
 
   # Clean files related to editors and IDEs.
-  cleanSourceFilterEditors = name: type: let baseName = baseNameOf (toString name); in ! (
-    type != "directory" && (
-      baseName == ".dir-locals.el"
-      || baseName == ".netrwhist"
-      || baseName == ".projectile"
-      || baseName == ".tags"
-      || baseName == ".vim.custom"
-      || baseName == ".vscodeignore"
-      || super.lib.hasPrefix "#" baseName
-      || super.lib.hasPrefix ".#" baseName
-      || super.lib.hasPrefix "flycheck_" baseName
-      || builtins.match "^.*_flymake\\..*$" baseName != null
-    )
-  );
-  cleanSourceEditors = src: super.lib.cleanSourceWith { filter = cleanSourceFilterEditors; inherit src; };
+  cleanSourceFilterEditors = name: type:
+    let baseName = baseNameOf (toString name); in
+      ! (
+        type != "directory" && (
+          baseName == ".dir-locals.el"
+          || baseName == ".netrwhist"
+          || baseName == ".projectile"
+          || baseName == ".tags"
+          || baseName == ".vim.custom"
+          || baseName == ".vscodeignore"
+          || prev.lib.hasPrefix "#" baseName
+          || prev.lib.hasPrefix ".#" baseName
+          || prev.lib.hasPrefix "flycheck_" baseName
+          || builtins.match "^.*_flymake\\..*$" baseName != null
+        )
+      );
+  cleanSourceEditors = src: prev.lib.cleanSourceWith { filter = cleanSourceFilterEditors; inherit src; };
 
 
   # Clean maintainer files that don't affect Nix builds.
-  cleanSourceFilterMaintainer = name: type: let baseName = baseNameOf (toString name); in ! (
-    # Note: .git can be a file when it's in a submodule directory
-    baseName == ".git"
-    || (
-      type != "directory" && (
-        baseName == ".gitattributes"
-        || baseName == ".gitignore"
-        || baseName == ".gitmodules"
-        || baseName == ".npmignore"
-        || baseName == ".travis.yml"
-      )
-    )
-  );
-  cleanSourceMaintainer = src: super.lib.cleanSourceWith { filter = cleanSourceFilterMaintainer; inherit src; };
+  cleanSourceFilterMaintainer = name: type:
+    let baseName = baseNameOf (toString name); in
+      ! (
+        # Note: .git can be a file when it's in a submodule directory
+        baseName == ".git"
+        || (
+          type != "directory" && (
+            baseName == ".gitattributes"
+            || baseName == ".gitignore"
+            || baseName == ".gitmodules"
+            || baseName == ".npmignore"
+            || baseName == ".travis.yml"
+          )
+        )
+      );
+  cleanSourceMaintainer = src: prev.lib.cleanSourceWith { filter = cleanSourceFilterMaintainer; inherit src; };
 
 
   # A cleaner that combines all of the cleaners defined here, plus
@@ -100,7 +110,7 @@ let
                 cleanSourceHaskell
                   (
                     cleanSourceNix
-                      (super.lib.cleanSource src)
+                      (prev.lib.cleanSource src)
                   )
               )
           )
@@ -140,7 +150,8 @@ let
         false
       );
       filteredNames = builtins.filter allowedName names;
-    in builtins.listToAttrs (
+    in
+    builtins.listToAttrs (
       builtins.map
         (
           name: {
@@ -153,16 +164,16 @@ let
 
   pathDirectory = listDirectory (d: d);
   importDirectory = listDirectory import;
-  mkCallDirectory = callPkgs: listDirectory (p: callPkgs p {});
+  mkCallDirectory = callPkgs: listDirectory (p: callPkgs p { });
 in
 {
-  lib = (super.lib or {}) // {
+  lib = (prev.lib or { }) // {
 
     # XXX dhess - temporary fix for Rust build-support in upstream
     # nixpkgs.
     filterSource = builtins.filterSource;
 
-    sources = (super.lib.sources or {}) // {
+    sources = (prev.lib.sources or { }) // {
       # Filters.
       inherit cleanSourceFilterNix;
       inherit cleanSourceFilterHaskell;

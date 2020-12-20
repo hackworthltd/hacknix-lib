@@ -1,7 +1,7 @@
 ## Things that I do all the time with attrsets, but aren't included in
 ## Nix or nixpkgs, for whatever reason.
 
-self: super:
+final: prev:
 let
   ## Tests on attrsets.
 
@@ -22,7 +22,7 @@ let
   */
 
   allAttrs = pred: attrs:
-    super.lib.all pred (super.lib.mapAttrsToList (_: value: value) attrs);
+    prev.lib.all pred (prev.lib.mapAttrsToList (_: value: value) attrs);
 
 
   /* Given an attrset, return true if `pred` is true for any value in
@@ -42,7 +42,7 @@ let
   */
 
   anyAttrs = pred: attrs:
-    super.lib.any pred (super.lib.mapAttrsToList (_: value: value) attrs);
+    prev.lib.any pred (prev.lib.mapAttrsToList (_: value: value) attrs);
 
 
   /* Given an attrset, return true if `pred` is true for no value in
@@ -76,11 +76,11 @@ let
      `mapAttrsToList (_: v: f v) s`.
   */
 
-  mapValuesToList = f: attrs: super.lib.mapAttrsToList (_: v: f v) attrs;
+  mapValuesToList = f: attrs: prev.lib.mapAttrsToList (_: v: f v) attrs;
 in
 {
-  lib = (super.lib or {}) // {
-    attrsets = (super.lib.attrsets or {}) // {
+  lib = (prev.lib or { }) // {
+    attrsets = (prev.lib.attrsets or { }) // {
       inherit allAttrs anyAttrs noAttrs mapValuesToList;
     };
   };

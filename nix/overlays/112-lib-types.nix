@@ -1,12 +1,12 @@
 ## Additional useful types, mostly for NixOS modules.
 
-self: super:
+final: prev:
 let
-  inherit (super.lib) all ipaddr mkOption stringToCharacters types;
-  inherit (super.lib.secrets) resolvesToStorePath;
+  inherit (prev.lib) all ipaddr mkOption stringToCharacters types;
+  inherit (prev.lib.secrets) resolvesToStorePath;
 
   addCheckDesc = desc: elemType: check: types.addCheck elemType check
-  // { description = "${elemType.description} (with check: ${desc})"; };
+    // { description = "${elemType.description} (with check: ${desc})"; };
 
   ## String types.
 
@@ -87,8 +87,8 @@ let
 in
 rec
 {
-  lib = (super.lib or {}) // {
-    types = (super.lib.types or {}) // {
+  lib = (prev.lib or { }) // {
+    types = (prev.lib.types or { }) // {
       inherit nonEmptyStr;
       inherit storePath nonStorePath;
       inherit ipv4 ipv4CIDR ipv4NoCIDR ipv4RFC1918 ipv4RFC1918CIDR ipv4RFC1918NoCIDR;

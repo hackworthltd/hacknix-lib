@@ -1,15 +1,15 @@
-self: super:
+final: prev:
 let
-  # A proper super.haskellPackage.extend that fixes
+  # A proper prev.haskellPackage.extend that fixes
   # https://github.com/NixOS/nixpkgs/issues/26561.
   #
-  # Note that f takes super: self: arguments, scoped within the
+  # Note that f takes prev: self: arguments, scoped within the
   # Haskell package set hp.
 
   properExtend = hp: f: hp.override (
     oldArgs: {
       overrides =
-        super.lib.composeExtensions (oldArgs.overrides or (_: _: {}))
+        prev.lib.composeExtensions (oldArgs.overrides or (_: _: { }))
           f;
     }
   );
@@ -19,9 +19,9 @@ let
   ## entire package set, rather than just a package here or there.
   noHaddocks = hp: (
     properExtend hp (
-      self: super: (
+      self: prev: (
         {
-          mkDerivation = args: super.mkDerivation (
+          mkDerivation = args: prev.mkDerivation (
             args // {
               doHaddock = false;
             }
@@ -32,8 +32,8 @@ let
   );
 in
 {
-  haskell = (super.haskell or {}) // {
-    lib = (super.haskell.lib or {}) // {
+  haskell = (prev.haskell or { }) // {
+    lib = (prev.haskell.lib or { }) // {
       inherit noHaddocks;
       inherit properExtend;
     };

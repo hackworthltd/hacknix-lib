@@ -1,4 +1,4 @@
-self: super:
+final: prev:
 let
   ## Google Public DNS servers.
 
@@ -37,8 +37,8 @@ let
   aAndADNSOverTLS = aAndAV4DNSOverTLS ++ aAndAV6DNSOverTLS;
 in
 {
-  lib = (super.lib or {}) // {
-    dns = (super.lib.dns or {}) // {
+  lib = (prev.lib or { }) // {
+    dns = (prev.lib.dns or { }) // {
       inherit googleV4DNS googleV6DNS googleDNS;
       inherit cloudflareV4DNS cloudflareV6DNS cloudflareDNS;
       inherit cloudflareV4DNSOverTLS cloudflareV6DNSOverTLS cloudflareDNSOverTLS;
