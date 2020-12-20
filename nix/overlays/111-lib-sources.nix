@@ -132,6 +132,17 @@ let
     )
   );
 
+  gitHubFlakeAttrs = inputName: lockFile:
+    let
+      lock = builtins.fromJSON (builtins.readFile lockFile);
+      inherit (lock.nodes."${inputName}".locked) owner repo rev narHash;
+      sha256 = narHash;
+      url = "https://github.com/${owner}/${repo}/archive/${rev}.tar.gz";
+    in
+    {
+      inherit owner repo rev narHash sha256 url;
+    };
+
 in
 {
   lib = (prev.lib or { }) // {
@@ -157,6 +168,8 @@ in
       inherit cleanSourceAllExtraneous;
 
       inherit cleanPackage;
+
+      inherit gitHubFlakeAttrs;
     };
   };
 }
