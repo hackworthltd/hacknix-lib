@@ -14,10 +14,11 @@
     let
       supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
-      overlay = import overlays/default.nix;
     in
     {
-      inherit overlay;
+      overlays = map
+        (name: import (./nix/overlays + "/${name}"))
+        (builtins.attrNames (builtins.readDir ./nix/overlays));
 
       packages = forAllSystems
         (system:
@@ -29,7 +30,7 @@
                   allowUnfree = true;
                   allowBroken = true;
                 };
-                overlays = [ self.overlay ];
+                overlays = self.overlays;
               };
           in
           {
@@ -49,8 +50,7 @@
                   allowBroken = true;
                   inHydra = true;
                 };
-                overlays = [
-                  overlay
+                overlays = self.overlays ++ [
                   (import ./tests)
                 ];
               };
