@@ -58,6 +58,8 @@
 
     in
     {
+      lib = nixpkgsFor.x86_64-linux.lib;
+
       # Nix's flake support expects this to be an attrset, even though
       # it's not useful as an attrset downstream (e.g.,
       # `nixpkgs.overlays` expects to be passed a list of overlays,
