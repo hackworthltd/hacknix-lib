@@ -8,7 +8,7 @@ in
 stdenv.mkDerivation {
   name = "dln-types-test-${version}";
   buildInputs = [ pkgs.nix ];
-  NIX_PATH = "nixpkgs=${pkgs.path}:nixpkgs-overlays=${pkgs.lib.hacknix-lib.path}/overlays/lib";
+  NIX_PATH = "nixpkgs=${pkgs.path}:nixpkgs-overlays=${pkgs.lib.hacknix-lib.path}/nix/overlays";
 
   buildCommand = ''
     datadir="${pkgs.nix}/share"
