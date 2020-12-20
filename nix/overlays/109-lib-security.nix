@@ -1,4 +1,4 @@
-self: super:
+final: prev:
 let
   ## Recommended pre-configured DH groups per IETF (RFC 7919:
   ## https://tools.ietf.org/html/rfc7919).
@@ -62,8 +62,8 @@ let
   sslModernCiphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256";
 in
 {
-  lib = (super.lib or {}) // {
-    security = (super.lib.security or {}) // {
+  lib = (prev.lib or { }) // {
+    security = (prev.lib.security or { }) // {
       inherit ffdhe2048 ffdhe3072 ffdhe4096;
       inherit sslModernCiphers;
     };

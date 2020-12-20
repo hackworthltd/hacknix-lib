@@ -1,10 +1,10 @@
-self: super:
+final: prev:
 let
   dhess = "Drew Hess <dhess-src@hackworthltd.com>";
 in
 {
-  lib = (super.lib or {}) // {
-    maintainers = (super.lib.maintainers or {}) // {
+  lib = (prev.lib or { }) // {
+    maintainers = (prev.lib.maintainers or { }) // {
       inherit dhess;
     };
   };

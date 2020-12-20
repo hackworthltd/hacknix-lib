@@ -1,11 +1,11 @@
-self: super:
+final: prev:
 let
   exclusiveOr = x: y: (x && !y) || (!x && y);
 in
 {
-  lib = (super.lib or {}) // {
+  lib = (prev.lib or { }) // {
     inherit exclusiveOr;
-    trivial = (super.lib.trivial or {}) // {
+    trivial = (prev.lib.trivial or { }) // {
       inherit exclusiveOr;
     };
   };

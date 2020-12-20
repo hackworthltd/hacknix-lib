@@ -1,6 +1,6 @@
-self: super:
+final: prev:
 let
-  packageSource = name: version: srcPath: super.callPackage ../pkgs/package-source {
+  packageSource = name: version: srcPath: prev.callPackage ../pkgs/package-source {
     inherit name version srcPath;
   };
 in

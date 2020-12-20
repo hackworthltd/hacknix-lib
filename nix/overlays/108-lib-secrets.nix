@@ -1,7 +1,7 @@
 ## Securely dealing with secrets; i.e., preventing them from
 ## entering the Nix store.
 
-self: super:
+final: prev:
 let
   # True if the argument is a path (or a string, when treated as a
   # path) that resolves to a Nix store path; i.e., the path begins
@@ -10,8 +10,9 @@ let
   resolvesToStorePath = x:
     let
       stringContext = "${x}";
-    in builtins.substring 0 1 stringContext == "/"
-    && super.lib.hasPrefix builtins.storeDir stringContext;
+    in
+    builtins.substring 0 1 stringContext == "/"
+    && prev.lib.hasPrefix builtins.storeDir stringContext;
 
 
   ## These are all predicated on the behavior of the `secretPath`
@@ -21,14 +22,14 @@ let
 
   secretPath = path:
     let safePath = toString path; in
-      if resolvesToStorePath safePath then "/illegal-secret-path" else safePath;
+    if resolvesToStorePath safePath then "/illegal-secret-path" else safePath;
 
   secretReadFile = path: builtins.readFile (secretPath path);
-  secretFileContents = path: super.lib.fileContents (secretPath path);
+  secretFileContents = path: prev.lib.fileContents (secretPath path);
 in
 {
-  lib = (super.lib or {}) // {
-    secrets = (super.lib.secrets or {}) // {
+  lib = (prev.lib or { }) // {
+    secrets = (prev.lib.secrets or { }) // {
       inherit resolvesToStorePath;
       inherit secretPath secretReadFile secretFileContents;
     };

@@ -1,10 +1,10 @@
-self: super:
+final: prev:
 let
   shortRev = builtins.substring 0 7;
 in
 {
-  lib = (super.lib or {}) // {
-    misc = (super.lib.misc or {}) // {
+  lib = (prev.lib or { }) // {
+    misc = (prev.lib.misc or { }) // {
       inherit shortRev;
     };
   };
