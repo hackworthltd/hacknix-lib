@@ -43,8 +43,6 @@
         );
 
       hydraJobs = {
-        build = self.packages;
-
         tests =
           with import (nixpkgs + "/pkgs/top-level/release-lib.nix")
             {
