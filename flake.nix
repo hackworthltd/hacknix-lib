@@ -10,7 +10,12 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
+  outputs =
+    { self
+    , nixpkgs
+    , flake-utils
+    , ...
+    }@inputs:
     let
       supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
       forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
@@ -65,12 +70,22 @@
       # `nixpkgs.overlays` expects to be passed a list of overlays,
       # not an attrset.)
       overlays = importDirectory ./nix/overlays // {
-        "000-lib-sources" = (final: prev: {
+        "000-lib-sources" = (_: prev: {
           lib = (prev.lib or { }) // {
             sources = (prev.lib.sources or { }) // {
               inherit listDirectory pathDirectory importDirectory mkCallDirectory;
             };
           };
+
+          "000-flakes" = (_: prev: {
+            lib = (prev.lib or { }) // {
+              hacknix-lib = (prev.lib.hacknix-lib or { }) // {
+                flake = (prev.lib.hacknix-lib.flake or { }) // {
+                  inherit inputs;
+                };
+              };
+            };
+          });
         });
       };
 
