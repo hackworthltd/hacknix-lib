@@ -15,12 +15,23 @@ let
     in
     prev.lib.filterAttrs supported pkgs;
 
+  # Create an attrset of buildable nixosConfigurations. This is useful
+  # for building via a Nix Flake's `hydraJobs`.
+  #
+  # Originally from:
+  # https://github.com/Mic92/doctor-cluster-config/blob/d9964365bb112898fe2b4abb77a8408adf8b1cb5/flake.nix#L36
+  buildNixosConfigurations = configurations:
+    prev.lib.mapAttrs'
+      (name: config: prev.lib.nameValuePair name config.config.system.build.toplevel)
+      configurations;
+
 in
 {
   lib = (prev.lib or { }) // {
     misc = (prev.lib.misc or { }) // {
       inherit shortRev;
       inherit filterPackagesByPlatform;
+      inherit buildNixosConfigurations;
     };
   };
 }
