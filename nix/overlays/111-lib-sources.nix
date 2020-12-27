@@ -20,12 +20,12 @@ let
     let baseName = baseNameOf (toString name); in
       ! (
         type != "directory" && (
-          prev.lib.hasSuffix ".nix" baseName
-          || prev.lib.hasPrefix "result-" baseName
+          final.lib.hasSuffix ".nix" baseName
+          || final.lib.hasPrefix "result-" baseName
           || baseName == "result"
         )
       );
-  cleanSourceNix = src: prev.lib.cleanSourceWith { filter = cleanSourceFilterNix; inherit src; };
+  cleanSourceNix = src: final.lib.cleanSourceWith { filter = cleanSourceFilterNix; inherit src; };
 
 
   # Clean Haskell projects.
@@ -33,19 +33,19 @@ let
     let baseName = baseNameOf (toString name); in
       ! (
         baseName == ".cabal-sandbox"
-        || prev.lib.hasPrefix ".stack-work" baseName
-        || prev.lib.hasPrefix ".ghc.environment" baseName
+        || final.lib.hasPrefix ".stack-work" baseName
+        || final.lib.hasPrefix ".ghc.environment" baseName
         || baseName == "dist"
         || baseName == "dist-newstyle"
         || baseName == ".ghci"
         || baseName == ".stylish-haskell.yaml"
-        || prev.lib.hasSuffix ".hi" baseName
+        || final.lib.hasSuffix ".hi" baseName
         || baseName == "cabal.sandbox.config"
         || baseName == "cabal.project"
         || baseName == "cabal.project.local"
         || baseName == "sources.txt"
       );
-  cleanSourceHaskell = src: prev.lib.cleanSourceWith { filter = cleanSourceFilterHaskell; inherit src; };
+  cleanSourceHaskell = src: final.lib.cleanSourceWith { filter = cleanSourceFilterHaskell; inherit src; };
 
 
   # Clean system cruft, e.g., .DS_Store files on macOS filesystems.
@@ -56,7 +56,7 @@ let
           baseName == ".DS_Store"
         )
       );
-  cleanSourceSystemCruft = src: prev.lib.cleanSourceWith { filter = cleanSourceFilterSystemCruft; inherit src; };
+  cleanSourceSystemCruft = src: final.lib.cleanSourceWith { filter = cleanSourceFilterSystemCruft; inherit src; };
 
 
   # Clean files related to editors and IDEs.
@@ -70,13 +70,13 @@ let
           || baseName == ".tags"
           || baseName == ".vim.custom"
           || baseName == ".vscodeignore"
-          || prev.lib.hasPrefix "#" baseName
-          || prev.lib.hasPrefix ".#" baseName
-          || prev.lib.hasPrefix "flycheck_" baseName
+          || final.lib.hasPrefix "#" baseName
+          || final.lib.hasPrefix ".#" baseName
+          || final.lib.hasPrefix "flycheck_" baseName
           || builtins.match "^.*_flymake\\..*$" baseName != null
         )
       );
-  cleanSourceEditors = src: prev.lib.cleanSourceWith { filter = cleanSourceFilterEditors; inherit src; };
+  cleanSourceEditors = src: final.lib.cleanSourceWith { filter = cleanSourceFilterEditors; inherit src; };
 
 
   # Clean maintainer files that don't affect Nix builds.
@@ -95,7 +95,7 @@ let
           )
         )
       );
-  cleanSourceMaintainer = src: prev.lib.cleanSourceWith { filter = cleanSourceFilterMaintainer; inherit src; };
+  cleanSourceMaintainer = src: final.lib.cleanSourceWith { filter = cleanSourceFilterMaintainer; inherit src; };
 
 
   # A cleaner that combines all of the cleaners defined here, plus
@@ -110,7 +110,7 @@ let
                 cleanSourceHaskell
                   (
                     cleanSourceNix
-                      (prev.lib.cleanSource src)
+                      (final.lib.cleanSource src)
                   )
               )
           )

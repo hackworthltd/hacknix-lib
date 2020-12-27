@@ -1,8 +1,6 @@
 ## Useful functions for dealing with IP addresses that are represented as strings.
 
 final: prev:
-
-with prev.lib;
 let
   ## These functions deal with IPv4 addresses expressed as a string.
 
@@ -19,18 +17,18 @@ let
     let
       good = builtins.match "^([[:digit:]]+)\\.([[:digit:]]+)\\.([[:digit:]]+)\\.([[:digit:]]+)(/[[:digit:]]+)?$" s;
       parse = if good == null then [ ] else good;
-      octets = map toInt (parsedIPv4Addr parse);
+      octets = map final.lib.toInt (parsedIPv4Addr parse);
       suffix =
         let
           suffix' = parsedIPv4PrefixLength parse;
         in
         if (suffix' == [ ] || suffix' == [ null ])
         then [ ]
-        else map (x: toInt (removePrefix "/" x)) suffix';
+        else map (x: final.lib.toInt (final.lib.removePrefix "/" x)) suffix';
     in
     if (parse != [ ])
-      && (all (x: x <= 255) octets)
-      && (all (x: x <= 32) suffix)
+      && (final.lib.all (x: x <= 255) octets)
+      && (final.lib.all (x: x <= 32) suffix)
     then octets ++ suffix
     else [ ];
 
@@ -43,11 +41,11 @@ let
     else
       let
         suffix = parsedIPv4PrefixLength parse;
-        octet1 = elemAt parse 0;
-        octet2 = elemAt parse 1;
-        block1 = octet1 == 10 && (suffix == [ ] || head suffix >= 8);
-        block2 = octet1 == 172 && (octet2 >= 16 && octet2 < 32) && (suffix == [ ] || head suffix >= 12);
-        block3 = octet1 == 192 && octet2 == 168 && (suffix == [ ] || head suffix >= 16);
+        octet1 = final.lib.elemAt parse 0;
+        octet2 = final.lib.elemAt parse 1;
+        block1 = octet1 == 10 && (suffix == [ ] || final.lib.head suffix >= 8);
+        block2 = octet1 == 172 && (octet2 >= 16 && octet2 < 32) && (suffix == [ ] || final.lib.head suffix >= 12);
+        block3 = octet1 == 192 && octet2 == 168 && (suffix == [ ] || final.lib.head suffix >= 16);
       in
       if block1 || block2 || block3 then parse else [ ];
 
@@ -85,8 +83,8 @@ let
   ## format, e.g., [ 10 0 10 1 24 ] for 10.0.10.1/24, or [ 10 0 10 1 ]
   ## for 10.0.10.1 (no CIDR suffix).
 
-  parsedIPv4Addr = take 4;
-  parsedIPv4PrefixLength = drop 4;
+  parsedIPv4Addr = final.lib.take 4;
+  parsedIPv4PrefixLength = final.lib.drop 4;
 
   # [ 10 0 10 1 ] -> "10.0.10.1"
   # [ 10 0 10 1 24 ] -> "10.0.10.1/24"
@@ -100,19 +98,19 @@ let
       octets = parsedIPv4Addr l;
       suffix = parsedIPv4PrefixLength l;
     in
-    if (length l < 4)
-      || (length l > 5)
-      || (any (x: x < 0 || x > 255) octets)
-      || (any (x: x < 0 || x > 32) suffix)
+    if (final.lib.length l < 4)
+      || (final.lib.length l > 5)
+      || (final.lib.any (x: x < 0 || x > 255) octets)
+      || (final.lib.any (x: x < 0 || x > 32) suffix)
     then ""
     else
       let
-        addr = concatMapStringsSep "." toString octets;
-        suffix' = concatMapStrings toString suffix;
+        addr = final.lib.concatMapStringsSep "." toString octets;
+        suffix' = final.lib.concatMapStrings toString suffix;
       in
       if suffix' == ""
       then addr
-      else concatStringsSep "/" [ addr suffix' ];
+      else final.lib.concatStringsSep "/" [ addr suffix' ];
 
 
   ## These functions deal with IPv6 addresses expressed as a string.
@@ -147,13 +145,13 @@ let
       # Note that if the parse matches, we still have to check the
       # prefix (if given) is <= 128. This is a bit clumsy.
       good = builtins.match "^(${rfc3986})$" s;
-      parse = if good == null then [ ] else take 1 good;
+      parse = if good == null then [ ] else final.lib.take 1 good;
       suffix = if parse == [ ] then [ ] else parsedIPv6PrefixLength parse;
     in
     if (suffix == [ ])
     then parse
     else
-      if (head suffix <= 128) then parse else [ ];
+      if (final.lib.head suffix <= 128) then parse else [ ];
 
   isIPv6 = s: (parseIPv6 s) != [ ];
 
@@ -175,18 +173,18 @@ let
 
   parsedIPv6PrefixLength = l:
     let
-      addr = head l;
-      suffix = tail (splitString "/" addr);
+      addr = final.lib.head l;
+      suffix = final.lib.tail (final.lib.splitString "/" addr);
     in
-    if suffix == [ ] then [ ] else map toInt suffix;
+    if suffix == [ ] then [ ] else map final.lib.toInt suffix;
 
   parsedIPv6Addr = l:
     let
-      addr = head l;
+      addr = final.lib.head l;
     in
-    head (splitString "/" addr);
+    final.lib.head (final.lib.splitString "/" addr);
 
-  unparseIPv6 = l: if l == [ ] then "" else head l;
+  unparseIPv6 = l: if l == [ ] then "" else final.lib.head l;
 
 
   ## Convenience functions.
@@ -229,15 +227,15 @@ let
 
   ipv4AddrFromCIDR = s:
     assert isIPv4CIDR s;
-    head (splitString "/" s);
+    final.lib.head (final.lib.splitString "/" s);
 
   ipv6AddrFromCIDR = s:
     assert isIPv6CIDR s;
-    head (splitString "/" s);
+    final.lib.head (final.lib.splitString "/" s);
 
   prefixLengthFromCIDR = s:
     assert (isIPv4CIDR s) || (isIPv6CIDR s);
-    toInt (head (tail (splitString "/" s)));
+    final.lib.toInt (final.lib.head (final.lib.tail (final.lib.splitString "/" s)));
 
   netmaskFromIPv4CIDR = s:
     assert isIPv4CIDR s;

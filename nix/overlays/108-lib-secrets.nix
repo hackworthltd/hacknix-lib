@@ -12,7 +12,7 @@ let
       stringContext = "${x}";
     in
     builtins.substring 0 1 stringContext == "/"
-    && prev.lib.hasPrefix builtins.storeDir stringContext;
+    && final.lib.hasPrefix builtins.storeDir stringContext;
 
 
   ## These are all predicated on the behavior of the `secretPath`
@@ -25,7 +25,7 @@ let
     if resolvesToStorePath safePath then "/illegal-secret-path" else safePath;
 
   secretReadFile = path: builtins.readFile (secretPath path);
-  secretFileContents = path: prev.lib.fileContents (secretPath path);
+  secretFileContents = path: final.lib.fileContents (secretPath path);
 in
 {
   lib = (prev.lib or { }) // {
