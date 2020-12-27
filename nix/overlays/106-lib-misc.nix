@@ -13,7 +13,7 @@ let
       supported = _: drv: builtins.elem system (packagePlatforms drv);
 
     in
-    prev.lib.filterAttrs supported pkgs;
+    final.lib.filterAttrs supported pkgs;
 
   # Create an attrset of buildable nixosConfigurations. This is useful
   # for building via a Nix Flake's `hydraJobs`.
@@ -21,8 +21,8 @@ let
   # Originally from:
   # https://github.com/Mic92/doctor-cluster-config/blob/d9964365bb112898fe2b4abb77a8408adf8b1cb5/flake.nix#L36
   buildNixosConfigurations = configurations:
-    prev.lib.mapAttrs'
-      (name: config: prev.lib.nameValuePair name config.config.system.build.toplevel)
+    final.lib.mapAttrs'
+      (name: config: final.lib.nameValuePair name config.config.system.build.toplevel)
       configurations;
 
 in

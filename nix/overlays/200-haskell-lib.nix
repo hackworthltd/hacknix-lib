@@ -9,7 +9,7 @@ let
   properExtend = hp: f: hp.override (
     oldArgs: {
       overrides =
-        prev.lib.composeExtensions (oldArgs.overrides or (_: _: { }))
+        final.lib.composeExtensions (oldArgs.overrides or (_: _: { }))
           f;
     }
   );

@@ -7,11 +7,11 @@ let
   # Adapted from:
   # https://github.com/jwiegley/nix-config/blob/d22b72f14510d07e1438907e87cf26b34390a25f/overlays/10-emacs.nix#L929
   melpaPackagesNgFor' = emacs: epkgsOverrides:
-    (prev.emacsPackagesNgFor emacs).overrideScope' (
+    (final.emacsPackagesNgFor emacs).overrideScope' (
       _: epkgs:
-        prev.lib.fix
+        final.lib.fix
           (
-            prev.lib.extends
+            final.lib.extends
               epkgsOverrides
               (
                 _: epkgs.melpaPackages

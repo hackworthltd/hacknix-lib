@@ -4,7 +4,7 @@ let
     let
       value = builtins.getEnv name;
     in
-    assert prev.lib.assertMsg (value != "")
+    assert final.lib.assertMsg (value != "")
       "environment.getEnvNonEmpty: environment variable ${name} is not set or has empty value";
     value;
 in

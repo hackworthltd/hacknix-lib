@@ -2,8 +2,8 @@
 
 final: prev:
 let
-  inherit (prev.lib) all ipaddr mkOption stringToCharacters types;
-  inherit (prev.lib.secrets) resolvesToStorePath;
+  inherit (final.lib) all ipaddr mkOption stringToCharacters types;
+  inherit (final.lib.secrets) resolvesToStorePath;
 
   addCheckDesc = desc: elemType: check: types.addCheck elemType check
     // { description = "${elemType.description} (with check: ${desc})"; };

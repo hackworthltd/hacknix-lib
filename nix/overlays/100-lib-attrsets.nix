@@ -22,7 +22,7 @@ let
   */
 
   allAttrs = pred: attrs:
-    prev.lib.all pred (prev.lib.mapAttrsToList (_: value: value) attrs);
+    final.lib.all pred (final.lib.mapAttrsToList (_: value: value) attrs);
 
 
   /* Given an attrset, return true if `pred` is true for any value in
@@ -42,7 +42,7 @@ let
   */
 
   anyAttrs = pred: attrs:
-    prev.lib.any pred (prev.lib.mapAttrsToList (_: value: value) attrs);
+    final.lib.any pred (final.lib.mapAttrsToList (_: value: value) attrs);
 
 
   /* Given an attrset, return true if `pred` is true for no value in
@@ -76,7 +76,7 @@ let
      `mapAttrsToList (_: v: f v) s`.
   */
 
-  mapValuesToList = f: attrs: prev.lib.mapAttrsToList (_: v: f v) attrs;
+  mapValuesToList = f: attrs: final.lib.mapAttrsToList (_: v: f v) attrs;
 in
 {
   lib = (prev.lib or { }) // {
