@@ -19,12 +19,14 @@
     , ...
     }@inputs:
     let
+      forAllSystems = systems: f: nixpkgs.lib.genAttrs systems (system: f system);
+
       supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
-      forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
+      forAllSupportedSystems = forAllSystems supportedSystems;
 
       overlaysAsList = map (name: self.overlays.${name}) (builtins.attrNames self.overlays);
 
-      pkgsFor = forAllSystems
+      pkgsFor = forAllSupportedSystems
         (system:
           import nixpkgs
             {
@@ -86,7 +88,15 @@
           };
         };
 
-        "000-flakes" = final: prev: {
+        "100-lib-flakes" = final: prev: {
+          lib = (prev.lib or { }) // {
+            flakes = (prev.lib.flakes or { }) // {
+              inherit forAllSystems;
+            };
+          };
+        };
+
+        "000-hacknix-lib-flake" = final: prev: {
           lib = (prev.lib or { }) // {
             hacknix-lib = (prev.lib.hacknix-lib or { }) // {
               flake = (prev.lib.hacknix-lib.flake or { }) // {
@@ -97,7 +107,7 @@
         };
       };
 
-      packages = forAllSystems
+      packages = forAllSupportedSystems
         (system:
           let
             pkgs = pkgsFor.${system};
