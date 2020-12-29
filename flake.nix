@@ -70,23 +70,23 @@
       # `nixpkgs.overlays` expects to be passed a list of overlays,
       # not an attrset.)
       overlays = importDirectory ./nix/overlays // {
-        "000-lib-sources" = (final: prev: {
+        "000-lib-sources" = final: prev: {
           lib = (prev.lib or { }) // {
             sources = (prev.lib.sources or { }) // {
               inherit listDirectory pathDirectory importDirectory mkCallDirectory;
             };
           };
+        };
 
-          "000-flakes" = (final: prev: {
-            lib = (prev.lib or { }) // {
-              hacknix-lib = (prev.lib.hacknix-lib or { }) // {
-                flake = (prev.lib.hacknix-lib.flake or { }) // {
-                  inherit inputs;
-                };
+        "000-flakes" = final: prev: {
+          lib = (prev.lib or { }) // {
+            hacknix-lib = (prev.lib.hacknix-lib or { }) // {
+              flake = (prev.lib.hacknix-lib.flake or { }) // {
+                inherit inputs;
               };
             };
-          });
-        });
+          };
+        };
       };
 
       packages = forAllSystems
