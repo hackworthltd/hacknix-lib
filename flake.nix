@@ -24,12 +24,18 @@
 
       overlaysAsList = map (name: self.overlays.${name}) (builtins.attrNames self.overlays);
 
-      nixpkgsFor = forAllSystems (system:
-        import nixpkgs {
-          inherit system;
-          overlays = overlaysAsList;
-        }
-      );
+      pkgsFor = forAllSystems
+        (system:
+          import nixpkgs
+            {
+              inherit system;
+              config = {
+                allowUnfree = true;
+                allowBroken = true;
+              };
+              overlays = overlaysAsList;
+            }
+        );
 
       ## Useful for importing whole directories.
       ##
@@ -65,7 +71,7 @@
 
     in
     {
-      lib = nixpkgsFor.x86_64-linux.lib;
+      lib = pkgsFor.x86_64-linux.lib;
 
       # Nix's flake support expects this to be an attrset, even though
       # it's not useful as an attrset downstream (e.g.,
@@ -94,15 +100,7 @@
       packages = forAllSystems
         (system:
           let
-            pkgs = import nixpkgs
-              {
-                inherit system;
-                config = {
-                  allowUnfree = true;
-                  allowBroken = true;
-                };
-                overlays = overlaysAsList;
-              };
+            pkgs = pkgsFor.${system};
           in
           {
             inherit (pkgs) ffdhe2048Pem ffdhe3072Pem ffdhe4096Pem;
