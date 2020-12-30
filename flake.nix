@@ -155,6 +155,83 @@
             dlnFfdhe = all;
             dlnTypes = all;
           };
+
+        nixosConfigurations =
+          let
+            extraModules = [
+              {
+                boot.isContainer = true;
+              }
+            ];
+            mkSystem = self.lib.flakes.nixosSystem' extraModules;
+            configs =
+              self.lib.flakes.nixosConfigurations.importFromDirectory
+                mkSystem
+                ./test-configs/nixos
+                {
+                  inherit (self) lib;
+                };
+          in
+          self.lib.flakes.nixosConfigurations.build configs;
+
+        amazonImages =
+          let
+            extraModules = [
+              {
+                ec2.hvm = true;
+                amazonImage.format = "qcow2";
+                amazonImage.sizeMB = 4096;
+              }
+            ];
+            mkSystem = self.lib.flakes.amazonImage extraModules;
+            configs =
+              self.lib.flakes.nixosConfigurations.importFromDirectory
+                mkSystem
+                ./test-configs/nixos
+                {
+                  inherit (self) lib;
+                };
+          in
+          self.lib.flakes.nixosConfigurations.buildAmazonImages configs;
+
+        isoImages =
+          let
+            extraModules = [
+              {
+                isoImage.isoBaseName = self.lib.mkForce "hacknix-lib-test-iso";
+              }
+            ];
+            mkSystem = self.lib.flakes.isoImage extraModules;
+            configs =
+              self.lib.flakes.nixosConfigurations.importFromDirectory
+                mkSystem
+                ./test-configs/nixos
+                {
+                  inherit (self) lib;
+                };
+          in
+          self.lib.flakes.nixosConfigurations.buildISOImages configs;
+
+
+        darwinConfigurations =
+          let
+            extraModules = [
+              {
+                services.nix-daemon.enable = true;
+                users.nix.configureBuildUsers = true;
+                users.nix.nrBuildUsers = 32;
+              }
+            ];
+            mkSystem = self.lib.flakes.darwinSystem' extraModules;
+            configs =
+              self.lib.flakes.darwinConfigurations.importFromDirectory
+                mkSystem
+                ./test-configs/nix-darwin
+                {
+                  inherit (self) lib;
+                };
+          in
+          self.lib.flakes.darwinConfigurations.build configs;
       };
     };
 }
