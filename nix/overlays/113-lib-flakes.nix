@@ -26,6 +26,28 @@ let
       modules = (config.modules or [ ]) ++ extraModules;
     });
 
+  # Like nixosSystem', but for building Amazon EC2 images. See
+  # nixpkgs's /nixos/maintainers/scripts/ec2/amazon-image.nix for the
+  # additional parameters that can be specified for Amazon EC2 images.
+  amazonImage = extraModules: config:
+    let
+      extraModules' = [
+        (final.path + "/nixos/maintainers/scripts/ec2/amazon-image.nix")
+      ] ++ extraModules;
+    in
+    nixosSystem' extraModules' config;
+
+  # Like nixosSystem', but for building ISO images. See nixpkgs's
+  # /nixos/modules/installer/cd-dvd/installation-cd-minimal.nix for
+  # the additional parameters that can be specified for ISO images.
+  isoImage = extraModules: config:
+    let
+      extraModules' = [
+        (final.path + "/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix")
+      ] ++ extraModules;
+    in
+    nixosSystem' extraModules' config;
+
   # Import a directory full of
   # nixosConfigurations/darwinConfigurations and apply a function that
   # has the same shape as nixosSystem'.
@@ -51,10 +73,10 @@ let
   # deployed to a live system or container).
   build = build' "toplevel";
 
-  # Build the `amazonImage` attribute.
+  # Build the `amazonImage` attribute. Use with amazonImage.
   buildAmazonImages = build' "amazonImage";
 
-  # Build the `isoImage` attribute.
+  # Build the `isoImage` attribute. Use with isoImage.
   buildISOImages = build' "isoImage";
 
   # Export nix-darwin's lib.darwinSystem function.
@@ -73,6 +95,7 @@ in
       inherit filterPackagesByPlatform;
 
       inherit nixosSystem nixosSystem';
+      inherit amazonImage isoImage;
 
       nixosConfigurations = (prev.lib.flakes.nixosConfigruations or { }) // {
         inherit importFromDirectory;
