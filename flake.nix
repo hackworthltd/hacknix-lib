@@ -19,12 +19,10 @@
     , ...
     }@inputs:
     let
-      forAllSystems = systems: f: nixpkgs.lib.genAttrs systems (system: f system);
+      bootstrap = (import ./nix/overlays/000-bootstrap.nix) { } nixpkgs;
 
       supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
-      forAllSupportedSystems = forAllSystems supportedSystems;
-
-      overlaysToList = overlays: map (name: overlays.${name}) (builtins.attrNames overlays);
+      forAllSupportedSystems = bootstrap.lib.flakes.forAllSystems supportedSystems;
 
       pkgsFor = forAllSupportedSystems
         (system:
@@ -35,78 +33,31 @@
                 allowUnfree = true;
                 allowBroken = true;
               };
-              overlays = overlaysToList self.overlays;
+              overlays = [ self.overlay ];
             }
         );
-
-      ## Useful for importing whole directories.
-      ##
-      ## Thanks to dtzWill:
-      ## https://github.com/dtzWill/nur-packages/commit/f601a6b024ac93f7ec242e6e3dbbddbdcf24df0b#diff-a013e20924130857c649dd17226282ff
-
-      listDirectory = action: dir:
-        let
-          list = builtins.readDir dir;
-          names = builtins.attrNames list;
-          allowedName = baseName: !(
-            # From lib/sources.nix, ignore editor backup/swap files
-            builtins.match "^\\.sw[a-z]$" baseName != null
-            || builtins.match "^\\..*\\.sw[a-z]$" baseName != null
-            || # Otherwise it's good
-            false
-          );
-          filteredNames = builtins.filter allowedName names;
-        in
-        builtins.listToAttrs (
-          builtins.map
-            (
-              name: {
-                name = builtins.replaceStrings [ ".nix" ] [ "" ] name;
-                value = action (dir + ("/" + name));
-              }
-            )
-            filteredNames
-        );
-      importDirectory = listDirectory import;
-      pathDirectory = listDirectory (d: d);
-      mkCallDirectory = callPkgs: listDirectory (p: callPkgs p { });
 
     in
     {
       lib = pkgsFor.x86_64-linux.lib;
 
-      # Nix's flake support expects this to be an attrset, even though
-      # it's not useful as an attrset downstream (e.g.,
-      # `nixpkgs.overlays` expects to be passed a list of overlays,
-      # not an attrset.)
-      overlays = importDirectory ./nix/overlays // {
-        "000-lib-sources" = final: prev: {
-          lib = (prev.lib or { }) // {
-            sources = (prev.lib.sources or { }) // {
-              inherit listDirectory pathDirectory importDirectory mkCallDirectory;
-            };
-          };
-        };
-
-        "100-lib-flakes" = final: prev: {
-          lib = (prev.lib or { }) // {
-            flakes = (prev.lib.flakes or { }) // {
-              inherit overlaysToList;
-              inherit forAllSystems;
-            };
-          };
-        };
-
-        "000-hacknix-lib-flake" = final: prev: {
-          lib = (prev.lib or { }) // {
-            hacknix-lib = (prev.lib.hacknix-lib or { }) // {
-              flake = (prev.lib.hacknix-lib.flake or { }) // {
-                inherit inputs;
-              };
-            };
-          };
-        };
-      };
+      overlay = final: prev:
+        bootstrap.lib.overlays.composeFromDir ./nix/overlays
+          (bootstrap.lib.overlays.compose
+            [
+              (final: prev:
+                {
+                  lib = (prev.lib or { }) // {
+                    hacknix-lib = (prev.lib.hacknix-lib or { }) // {
+                      flake = (prev.lib.hacknix-lib.flake or { }) // {
+                        inherit inputs;
+                      };
+                    };
+                  };
+                }
+              )
+            ]
+            prev);
 
       packages = forAllSupportedSystems
         (system:
@@ -132,7 +83,8 @@
                   allowBroken = true;
                   inHydra = true;
                 };
-                overlays = overlaysToList self.overlays ++ [
+                overlays = [
+                  self.overlay
                   (import ./tests)
                 ];
               };
