@@ -24,7 +24,7 @@
       supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
       forAllSupportedSystems = forAllSystems supportedSystems;
 
-      overlaysAsList = map (name: self.overlays.${name}) (builtins.attrNames self.overlays);
+      overlaysToList = overlays: map (name: overlays.${name}) (builtins.attrNames overlays);
 
       pkgsFor = forAllSupportedSystems
         (system:
@@ -35,7 +35,7 @@
                 allowUnfree = true;
                 allowBroken = true;
               };
-              overlays = overlaysAsList;
+              overlays = overlaysToList self.overlays;
             }
         );
 
@@ -91,6 +91,7 @@
         "100-lib-flakes" = final: prev: {
           lib = (prev.lib or { }) // {
             flakes = (prev.lib.flakes or { }) // {
+              inherit overlaysToList;
               inherit forAllSystems;
             };
           };
@@ -131,7 +132,7 @@
                   allowBroken = true;
                   inHydra = true;
                 };
-                overlays = overlaysAsList ++ [
+                overlays = overlaysToList self.overlays ++ [
                   (import ./tests)
                 ];
               };
