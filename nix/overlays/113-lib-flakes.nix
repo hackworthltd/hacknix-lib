@@ -50,7 +50,7 @@ let
 
   # Import a directory full of
   # nixosConfigurations/darwinConfigurations and apply a function that
-  # has the same shape as nixosSystem'.
+  # has the same shape as nixosSystem.
   importFromDirectory = nixosSystemFn: dir: args:
     final.lib.mapAttrs
       (_: cf:
