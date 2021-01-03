@@ -2,23 +2,29 @@ final: prev:
 let
   forAllSystems = systems: f: prev.lib.genAttrs systems (system: f system);
 
-  ## These functions are useful for building package sets from
-  ## stand-alone overlay repos.
+  # These functions are useful for building package sets from
+  # stand-alone overlay repos.
 
-  compose = overlays: pkgSet:
+  # This function is from nixpkgs, but uses "self" and "super" rather
+  # than "final" and "prev"; hence, it fails `nix flake check` :\.
+  composeExtensions =
+    f: g: final: prev:
     let
-      toFix = prev.lib.foldl' (prev.lib.flip prev.lib.extends) (prev.lib.const pkgSet) overlays;
+      fApplied = f final prev;
+      prev' = prev // fApplied;
     in
-    prev.lib.fix toFix;
+    fApplied // g final prev';
 
-  composeFromFiles = overlaysFiles: pkgSet:
-    compose (map import overlaysFiles) pkgSet;
+  combine = builtins.foldl' composeExtensions (_: _: { });
 
-  composeFromDir = dir: pkgSet:
+  combineFromFiles = overlaysFiles:
+    combine (map import overlaysFiles);
+
+  combineFromDir = dir:
     let
       files = prev.lib.filesystem.listFilesRecursive dir;
     in
-    composeFromFiles files pkgSet;
+    combineFromFiles files;
 
 in
 {
@@ -27,7 +33,7 @@ in
       inherit forAllSystems;
     };
     overlays = (prev.lib.overlays or { }) // {
-      inherit compose composeFromFiles composeFromDir;
+      inherit composeExtensions combine combineFromFiles combineFromDir;
     };
   };
 }

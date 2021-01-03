@@ -41,23 +41,24 @@
     {
       lib = pkgsFor.x86_64-linux.lib;
 
-      overlay = final: prev:
-        bootstrap.lib.overlays.composeFromDir ./nix/overlays
-          (bootstrap.lib.overlays.compose
-            [
-              (final: prev:
-                {
-                  lib = (prev.lib or { }) // {
-                    hacknix-lib = (prev.lib.hacknix-lib or { }) // {
-                      flake = (prev.lib.hacknix-lib.flake or { }) // {
-                        inherit inputs;
-                      };
-                    };
+      overlay =
+        let
+          overlaysFromDir = bootstrap.lib.overlays.combineFromDir ./nix/overlays;
+        in
+        bootstrap.lib.overlays.combine [
+          overlaysFromDir
+          (final: prev:
+            {
+              lib = (prev.lib or { }) // {
+                hacknix-lib = (prev.lib.hacknix-lib or { }) // {
+                  flake = (prev.lib.hacknix-lib.flake or { }) // {
+                    inherit inputs;
                   };
-                }
-              )
-            ]
-            prev);
+                };
+              };
+            }
+          )
+        ];
 
       packages = forAllSupportedSystems
         (system:
