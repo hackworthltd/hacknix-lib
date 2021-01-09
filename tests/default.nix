@@ -6,6 +6,7 @@ final: prev:
 let
   inherit (prev) callPackage;
   inherit (final) lib;
+  selfPath = ../.;
 in
 {
 
@@ -31,22 +32,22 @@ in
 
   ## attrsets tests.
 
-  dlnAttrSets = callPackage ./attrsets { };
+  dlnAttrSets = callPackage ./attrsets { inherit selfPath; };
 
 
   ## IP address utility tests.
 
-  dlnIPAddr = callPackage ./ipaddr { };
+  dlnIPAddr = callPackage ./ipaddr { inherit selfPath; };
 
 
   ## Miscellaneous tests.
 
-  dlnMisc = callPackage ./misc { };
+  dlnMisc = callPackage ./misc { inherit selfPath; };
 
 
   ## Types tests.
 
-  dlnTypes = callPackage ./types { };
+  dlnTypes = callPackage ./types { inherit selfPath; };
 
 
   ## Security tests.
