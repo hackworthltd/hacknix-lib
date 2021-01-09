@@ -13,16 +13,12 @@ let
     in
     final.lib.filterAttrs supported pkgs;
 
-  # For some reason, the nixpkgs flake doesn't roll its local
-  # lib.nixosSystem into nixpkgs.lib. We expose it here.
-  inherit (final.lib.hacknix-lib.flake.inputs.nixpkgs.lib) nixosSystem;
-
   # nixosSystem is difficult to compose, and it's often useful to
   # extend the modules declared in a given configuration; e.g., to
   # override one or more module definitions. This function makes it
   # possible to add extra modules to a configuration.
   nixosSystem' = extraModules: config:
-    nixosSystem (config // {
+    final.lib.flakes.nixosSystem (config // {
       modules = (config.modules or [ ]) ++ extraModules;
     });
 
@@ -79,12 +75,9 @@ let
   # Build the `isoImage` attribute. Use with isoImage.
   buildISOImages = build' "isoImage";
 
-  # Export nix-darwin's lib.darwinSystem function.
-  inherit (final.lib.hacknix-lib.flake.inputs.nix-darwin.lib) darwinSystem;
-
   # Like nixosSystem' for darwinSystem.
   darwinSystem' = extraModules: config:
-    darwinSystem (config // {
+    final.lib.flakes.darwinSystem (config // {
       modules = (config.modules or [ ]) ++ extraModules;
     });
 
@@ -94,7 +87,7 @@ in
     flakes = (prev.lib.flakes or { }) // {
       inherit filterPackagesByPlatform;
 
-      inherit nixosSystem nixosSystem';
+      inherit nixosSystem';
       inherit amazonImage isoImage;
 
       nixosConfigurations = (prev.lib.flakes.nixosConfigruations or { }) // {
@@ -102,7 +95,7 @@ in
         inherit build' build buildAmazonImages buildISOImages;
       };
 
-      inherit darwinSystem darwinSystem';
+      inherit darwinSystem';
 
       darwinConfigurations = (prev.lib.flakes.darwinConfigurations or { }) // {
         inherit importFromDirectory;
