@@ -16,6 +16,7 @@
   outputs =
     { self
     , nixpkgs
+    , nix-darwin
     , ...
     }@inputs:
     let
@@ -46,18 +47,21 @@
           overlaysFromDir = bootstrap.lib.overlays.combineFromDir ./nix/overlays;
         in
         bootstrap.lib.overlays.combine [
-          overlaysFromDir
           (final: prev:
             {
               lib = (prev.lib or { }) // {
-                hacknix-lib = (prev.lib.hacknix-lib or { }) // {
-                  flake = (prev.lib.hacknix-lib.flake or { }) // {
-                    inherit inputs;
-                  };
+                flakes = (prev.lib.flakes or { }) // {
+                  # For some reason, the nixpkgs flake doesn't roll its local
+                  # lib.nixosSystem into nixpkgs.lib. We expose it here.
+                  inherit (nixpkgs.lib) nixosSystem;
+
+                  # Ditto for nix-darwin's lib.darwinSystem function.
+                  inherit (nix-darwin.lib) darwinSystem;
                 };
               };
             }
           )
+          overlaysFromDir
         ];
 
       packages = forAllSupportedSystems

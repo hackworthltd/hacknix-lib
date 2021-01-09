@@ -1,6 +1,7 @@
 { stdenv
 , pkgs
 , lib
+, selfPath
 }:
 let
   version = "1";
@@ -8,7 +9,7 @@ in
 stdenv.mkDerivation {
   name = "dln-types-ipaddr-${version}";
   buildInputs = [ pkgs.nix ];
-  NIX_PATH = "nixpkgs=${pkgs.path}:nixpkgs-overlays=${pkgs.lib.hacknix-lib.path}/nix/overlays";
+  NIX_PATH = "nixpkgs=${pkgs.path}:nixpkgs-overlays=${selfPath}/nix/overlays";
 
   buildCommand = ''
     datadir="${pkgs.nix}/share"
@@ -25,7 +26,7 @@ stdenv.mkDerivation {
     cacheDir=$TEST_ROOT/binary-cache
 
     nix-store --init
-    cd ${pkgs.lib.hacknix-lib.path}/tests/ipaddr
+    cd ${selfPath}/tests/ipaddr
     
     nix-instantiate --eval --strict ipaddr.nix
     [[ "$(nix-instantiate --eval --strict ipaddr.nix)" == "[ ]" ]]
