@@ -25,6 +25,12 @@
       supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
       forAllSupportedSystems = bootstrap.lib.flakes.forAllSystems supportedSystems;
 
+      nixosSystems = [ "x86_64-linux" ];
+      forAllNixosSystems = bootstrap.lib.flakes.forAllSystems nixosSystems;
+
+      darwinSystems = [ "x86_64-darwin" ];
+      forAllDarwinSystems = bootstrap.lib.flakes.forAllSystems darwinSystems;
+
       pkgsFor = forAllSupportedSystems
         (system:
           import nixpkgs
@@ -77,44 +83,48 @@
       hydraJobs = {
         build = self.packages;
 
-        tests =
-          with import (nixpkgs + "/pkgs/top-level/release-lib.nix")
-            {
-              inherit supportedSystems;
-              scrubJobs = true;
-              nixpkgsArgs = {
-                config = {
-                  allowUnfree = false;
-                  allowBroken = true;
-                  inHydra = true;
+        tests = forAllSupportedSystems
+          (
+            system:
+              with import (nixpkgs + "/pkgs/top-level/release-lib.nix")
+                {
+                  supportedSystems = [ system ];
+                  scrubJobs = true;
+                  nixpkgsArgs = {
+                    config = {
+                      allowUnfree = false;
+                      allowBroken = true;
+                      inHydra = true;
+                    };
+                    overlays = [
+                      self.overlay
+                      (import ./tests)
+                    ];
+                  };
                 };
-                overlays = [
-                  self.overlay
-                  (import ./tests)
-                ];
-              };
-            };
-          mapTestOn {
-            dlnCleanSourceNix = all;
-            dlnCleanSourceHaskell = all;
-            dlnCleanSourceSystemCruft = all;
-            dlnCleanSourceEditors = all;
-            dlnCleanSourceMaintainer = all;
-            dlnCleanSourceAllExtraneous = all;
-            dlnCleanPackageNix = all;
-            dlnCleanPackageHaskell = all;
-            dlnCleanPackageSystemCruft = all;
-            dlnCleanPackageEditors = all;
-            dlnCleanPackageMaintainer = all;
-            dlnCleanPackageAllExtraneous = all;
-            dlnAttrSets = all;
-            dlnIPAddr = all;
-            dlnMisc = all;
-            dlnFfdhe = all;
-            dlnTypes = all;
-          };
+              mapTestOn {
+                dlnCleanSourceNix = all;
+                dlnCleanSourceHaskell = all;
+                dlnCleanSourceSystemCruft = all;
+                dlnCleanSourceEditors = all;
+                dlnCleanSourceMaintainer = all;
+                dlnCleanSourceAllExtraneous = all;
+                dlnCleanPackageNix = all;
+                dlnCleanPackageHaskell = all;
+                dlnCleanPackageSystemCruft = all;
+                dlnCleanPackageEditors = all;
+                dlnCleanPackageMaintainer = all;
+                dlnCleanPackageAllExtraneous = all;
+                dlnAttrSets = all;
+                dlnIPAddr = all;
+                dlnMisc = all;
+                dlnFfdhe = all;
+                dlnTypes = all;
+              }
+          );
 
-        nixosConfigurations =
+        nixosConfigurations = forAllNixosSystems (
+          system:
           let
             extraModules = [
               {
@@ -128,11 +138,14 @@
                 ./test-configs/nixos
                 {
                   inherit (self) lib;
+                  inherit system;
                 };
           in
-          self.lib.flakes.nixosConfigurations.build configs;
+          self.lib.flakes.nixosConfigurations.build configs
+        );
 
-        amazonImages =
+        amazonImages = forAllNixosSystems (
+          system:
           let
             extraModules = [
               {
@@ -148,11 +161,14 @@
                 ./test-configs/nixos
                 {
                   inherit (self) lib;
+                  inherit system;
                 };
           in
-          self.lib.flakes.nixosConfigurations.buildAmazonImages configs;
+          self.lib.flakes.nixosConfigurations.buildAmazonImages configs
+        );
 
-        isoImages =
+        isoImages = forAllNixosSystems (
+          system:
           let
             extraModules = [
               {
@@ -166,12 +182,15 @@
                 ./test-configs/nixos
                 {
                   inherit (self) lib;
+                  inherit system;
                 };
           in
-          self.lib.flakes.nixosConfigurations.buildISOImages configs;
+          self.lib.flakes.nixosConfigurations.buildISOImages configs
+        );
 
 
-        darwinConfigurations =
+        darwinConfigurations = forAllDarwinSystems (
+          system:
           let
             extraModules = [
               {
@@ -187,9 +206,13 @@
                 ./test-configs/nix-darwin
                 {
                   inherit (self) lib;
+                  inherit system;
                 };
           in
-          self.lib.flakes.darwinConfigurations.build configs;
+          self.lib.flakes.darwinConfigurations.build configs
+        );
       };
+
+      ciJobs = self.lib.flakes.recurseIntoHydraJobs self.hydraJobs;
     };
 }

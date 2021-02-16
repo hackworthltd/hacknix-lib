@@ -81,6 +81,26 @@ let
       modules = (config.modules or [ ]) ++ extraModules;
     });
 
+  /* Given a flake's hydraJobs, recurse into it setting
+     `recurseForDerivation` along the way. This is useful for
+     converting a flake's hydraJobs to something that
+     `nix-build/nix-instantiate` can build.
+  */
+
+  recurseIntoHydraJobs = set:
+    let
+      recurse = path: set:
+        let
+          g =
+            name: value:
+            if final.lib.isAttrs value
+            then ((recurse (path ++ [ name ]) value) // { recurseForDerivations = true; })
+            else value;
+        in
+        final.lib.mapAttrs g set;
+    in
+    recurse [ ] set;
+
 in
 {
   lib = (prev.lib or { }) // {
@@ -101,6 +121,8 @@ in
         inherit importFromDirectory;
         inherit build' build;
       };
+
+      inherit recurseIntoHydraJobs;
     };
   };
 }

@@ -1,3 +1,6 @@
+# Note: we should be able to pass `system` here, but darwinSystem
+# doesn't support that yet.
+
 { lib
 , ...
 }:
