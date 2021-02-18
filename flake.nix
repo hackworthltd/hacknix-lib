@@ -80,8 +80,44 @@
           }
         );
 
+      nixosConfigurations =
+        let
+          extraModules = [
+            {
+              boot.isContainer = true;
+            }
+          ];
+          mkSystem = self.lib.flakes.nixosSystem' extraModules;
+        in
+        self.lib.flakes.nixosConfigurations.importFromDirectory
+          mkSystem
+          ./test-configs/nixos
+          {
+            inherit (self) lib;
+          };
+
+      darwinConfigurations =
+        let
+          extraModules = [
+            {
+              services.nix-daemon.enable = true;
+              users.nix.configureBuildUsers = true;
+              users.nix.nrBuildUsers = 32;
+            }
+          ];
+          mkSystem = self.lib.flakes.darwinSystem' extraModules;
+        in
+        self.lib.flakes.darwinConfigurations.importFromDirectory
+          mkSystem
+          ./test-configs/nix-darwin
+          {
+            inherit (self) lib;
+          };
+
       hydraJobs = {
         build = self.packages;
+        nixosConfigurations.x86_64-linux = self.lib.flakes.nixosConfigurations.build self.nixosConfigurations;
+        darwinConfigurations.x86_64-darwin = self.lib.flakes.darwinConfigurations.build self.darwinConfigurations;
 
         tests = forAllSupportedSystems
           (
@@ -122,27 +158,6 @@
                 dlnTypes = all;
               }
           );
-
-        nixosConfigurations = forAllNixosSystems (
-          system:
-          let
-            extraModules = [
-              {
-                boot.isContainer = true;
-              }
-            ];
-            mkSystem = self.lib.flakes.nixosSystem' extraModules;
-            configs =
-              self.lib.flakes.nixosConfigurations.importFromDirectory
-                mkSystem
-                ./test-configs/nixos
-                {
-                  inherit (self) lib;
-                  inherit system;
-                };
-          in
-          self.lib.flakes.nixosConfigurations.build configs
-        );
 
         amazonImages = forAllNixosSystems (
           system:
@@ -186,30 +201,6 @@
                 };
           in
           self.lib.flakes.nixosConfigurations.buildISOImages configs
-        );
-
-
-        darwinConfigurations = forAllDarwinSystems (
-          system:
-          let
-            extraModules = [
-              {
-                services.nix-daemon.enable = true;
-                users.nix.configureBuildUsers = true;
-                users.nix.nrBuildUsers = 32;
-              }
-            ];
-            mkSystem = self.lib.flakes.darwinSystem' extraModules;
-            configs =
-              self.lib.flakes.darwinConfigurations.importFromDirectory
-                mkSystem
-                ./test-configs/nix-darwin
-                {
-                  inherit (self) lib;
-                  inherit system;
-                };
-          in
-          self.lib.flakes.darwinConfigurations.build configs
         );
       };
 

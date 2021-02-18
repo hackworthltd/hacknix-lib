@@ -1,9 +1,8 @@
 { lib
-, system
 , ...
 }:
 {
-  inherit system;
+  system = "x86_64-linux";
   modules = lib.singleton
     ({ pkgs, ... }:
       let
