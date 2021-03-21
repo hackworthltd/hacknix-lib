@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = github:NixOS/nixpkgs/nixpkgs-unstable;
 
-    nix-darwin.url = github:hackworthltd/nix-darwin/darwin-rebuild-nix-package;
+    nix-darwin.url = github:hackworthltd/nix-darwin/fixes;
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
     flake-compat = {
