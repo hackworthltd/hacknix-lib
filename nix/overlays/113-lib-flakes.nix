@@ -82,10 +82,12 @@ let
     });
 
   # Like build for but darwinSystem.
-  darwinBuild = configurations:
-    final.lib.mapAttrs'
+  #
+  # Note: we also need to set dontRecurseIntoAttrs.
+  darwinBuild = configurations: final.dontRecurseIntoAttrs
+    (final.lib.mapAttrs'
       (name: config: final.lib.nameValuePair name config.config.system)
-      configurations;
+      configurations);
 
   /* Given a flake's hydraJobs, recurse into it setting
     `recurseForDerivation` along the way. This is useful for
