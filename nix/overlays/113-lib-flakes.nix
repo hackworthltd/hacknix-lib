@@ -81,10 +81,16 @@ let
       modules = (config.modules or [ ]) ++ extraModules;
     });
 
+  # Like build for but darwinSystem.
+  darwinBuild = configurations:
+    final.lib.mapAttrs'
+      (name: config: final.lib.nameValuePair name config.config.system)
+      configurations;
+
   /* Given a flake's hydraJobs, recurse into it setting
-     `recurseForDerivation` along the way. This is useful for
-     converting a flake's hydraJobs to something that
-     `nix-build/nix-instantiate` can build.
+    `recurseForDerivation` along the way. This is useful for
+    converting a flake's hydraJobs to something that
+    `nix-build/nix-instantiate` can build.
   */
 
   recurseIntoHydraJobs = set:
@@ -119,7 +125,7 @@ in
 
       darwinConfigurations = (prev.lib.flakes.darwinConfigurations or { }) // {
         inherit importFromDirectory;
-        inherit build' build;
+        build = darwinBuild;
       };
 
       inherit recurseIntoHydraJobs;
