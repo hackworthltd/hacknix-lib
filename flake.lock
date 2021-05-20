@@ -23,27 +23,27 @@
         ]
       },
       "locked": {
-        "lastModified": 1617963326,
-        "narHash": "sha256-UStSb/0RFlT94i0kwwsoWBMpfEGIykU+AVlJRJlSZXc=",
+        "lastModified": 1621547291,
+        "narHash": "sha256-CfdzGMrQGPNu9fV8FvU/C+PjXBNdlJ8cudAMX9xYzLE=",
         "owner": "hackworthltd",
         "repo": "nix-darwin",
-        "rev": "a19688810b99204cfde7dd5b488d09b0f5fa9269",
+        "rev": "50cc949083526d0b25dfcfc32de4e987af566fd3",
         "type": "github"
       },
       "original": {
         "owner": "hackworthltd",
-        "ref": "fixes-v5",
+        "ref": "fixes-v6",
         "repo": "nix-darwin",
         "type": "github"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1621420722,
-        "narHash": "sha256-dVnq/0eaN6HaAbgxgK6muSy0t2fD/Ayss2WUfvkJ5qs=",
+        "lastModified": 1621471095,
+        "narHash": "sha256-Ses8dUMzdkx/BVn2VznrTtv+DvagdJ2X2aQg/h/O/co=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "7013a0f2791da4c38c7e6f56d48139aeb344991b",
+        "rev": "80fcac0b311031657783b721c935d2d9348dffee",
         "type": "github"
       },
       "original": {
